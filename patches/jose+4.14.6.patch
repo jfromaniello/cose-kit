@@ -1,0 +1,19 @@
+diff --git a/node_modules/jose/package.json b/node_modules/jose/package.json
+index efff6aa..be0db2d 100644
+--- a/node_modules/jose/package.json
++++ b/node_modules/jose/package.json
+@@ -68,6 +68,14 @@
+       "import": "./dist/node/esm/index.js",
+       "require": "./dist/node/cjs/index.js"
+     },
++    "./sign": {
++      "bun": "./dist/browser/runtime/sign.js",
++      "deno": "./dist/browser/runtime/sign.js",
++      "browser": "./dist/browser/runtime/sign.js",
++      "worker": "./dist/browser/runtime/sign.js",
++      "import": "./dist/node/esm/runtime/sign.js",
++      "require": "./dist/node/cjs/runtime/sign.js"
++    },
+     "./package.json": "./package.json"
+   },
+   "main": "./dist/node/cjs/index.js",
