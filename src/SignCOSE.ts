@@ -1,7 +1,9 @@
 import { KeyLike } from "jose";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import sign from "jose/sign";
 
-export class SignJWT {
+export class SignCOSE {
   // private _protectedHeader!: JWTHeaderParameters
 
   // /**
@@ -22,8 +24,9 @@ export class SignJWT {
   //  * @param options JWT Sign options.
   //  */
   async sign(key: KeyLike | Uint8Array): Promise<Uint8Array> {
-    console.dir(key);
-    throw new Error("Not implemented");
+    const b = Buffer.from("Hello World");
+    const signed = await sign('ES256', key, b);
+    return signed;
   }
   //   const sig = new CompactSign(encoder.encode(JSON.stringify(this._payload)))
   //   sig.setProtectedHeader(this._protectedHeader)

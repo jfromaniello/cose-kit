@@ -1,8 +1,8 @@
 diff --git a/node_modules/jose/package.json b/node_modules/jose/package.json
-index efff6aa..be0db2d 100644
+index efff6aa..1ec7ba3 100644
 --- a/node_modules/jose/package.json
 +++ b/node_modules/jose/package.json
-@@ -68,6 +68,14 @@
+@@ -68,6 +68,30 @@
        "import": "./dist/node/esm/index.js",
        "require": "./dist/node/cjs/index.js"
      },
@@ -13,6 +13,22 @@ index efff6aa..be0db2d 100644
 +      "worker": "./dist/browser/runtime/sign.js",
 +      "import": "./dist/node/esm/runtime/sign.js",
 +      "require": "./dist/node/cjs/runtime/sign.js"
++    },
++    "./verify": {
++      "bun": "./dist/browser/runtime/verify.js",
++      "deno": "./dist/browser/runtime/verify.js",
++      "browser": "./dist/browser/runtime/verify.js",
++      "worker": "./dist/browser/runtime/verify.js",
++      "import": "./dist/node/esm/runtime/verify.js",
++      "require": "./dist/node/cjs/runtime/verify.js"
++    },
++    "./jwks/local": {
++      "bun": "./dist/browser/jwks/local.js",
++      "deno": "./dist/browser/jwks/local.js",
++      "browser": "./dist/browser/jwks/local.js",
++      "worker": "./dist/browser/jwks/local.js",
++      "import": "./dist/node/esm/jwks/local.js",
++      "require": "./dist/node/cjs/jwks/local.js"
 +    },
      "./package.json": "./package.json"
    },
