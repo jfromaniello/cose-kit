@@ -6,6 +6,7 @@
       "node",
       "jest"
     ],
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "sourceMap": true
   }
 }

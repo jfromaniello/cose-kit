@@ -43,8 +43,23 @@ const cose = Buffer.from(coseHEX, 'hex');
 const { isValid } = await coseVerifyX509(cose, caRoots);
 ```
 
+Signing a payload:
 
 
+```js
+const { importJWK } = require('jose');
+const { sign }  = require('cose');
+
+const key = await importJWK(jwk);
+
+const cose = await sign(
+  { alg: 'ES256' },
+  { ctyp: 0 },
+  'hello world',
+  key
+);
+
+```
 
 
 ## Credits
