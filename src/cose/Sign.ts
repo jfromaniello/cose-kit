@@ -1,21 +1,9 @@
 import { Encoder } from 'cbor-x';
 
 import { SignatureBase, WithHeaders } from './SignatureBase';
-import { KeyLike, importX509 } from 'jose';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import joseVerify from "#runtime/verify";
+import { KeyLike } from 'jose';
+import verify from "#runtime/verify";
 import { COSEVerifyGetKey } from '../jwks/local';
-import { pkijs } from '#runtime/pkijs';
-import { decodeBase64, encodeBase64 } from '#runtime/base64';
-
-const pemToCert = (cert: string): string => {
-  const pem = /-----BEGIN (\w*)-----([^-]*)-----END (\w*)-----/g.exec(cert.toString());
-  if (pem && pem.length > 0) {
-    return pem[2].replace(/[\n|\r\n]/g, '');
-  }
-  return '';
-};
 
 const encoder = new Encoder({
   tagUint8Array: false,
@@ -64,7 +52,8 @@ export class Sign extends WithHeaders {
     roots: string[]
   ): Promise<boolean> {
     const results = await Promise.all(this.signatures.map(async (signature) => {
-      return signature.verifyX509(roots, this.encodedProtectedHeader, this.payload);
+      const key = await signature.verifyX509Chain(roots);
+      return signature.verify(key, this.encodedProtectedHeader, this.payload);
     }));
 
     return results.every(Boolean);
@@ -106,35 +95,6 @@ export class Signature extends SignatureBase {
       throw new Error('unknown algorithm: ' + this.alg);
     }
 
-    return joseVerify(this.algName, key, this.signature, toBeSigned);
-  }
-
-  async verifyX509(
-    caRoots: string[],
-    bodyProtectedHeaders: Uint8Array | undefined,
-    payload: Uint8Array
-  ): Promise<boolean> {
-    if (!this.x5chain || this.x5chain.length === 0) { return false; }
-
-    const chainEngine = new pkijs.CertificateChainValidationEngine({
-      certs: this.x5chain.map((c) => pkijs.Certificate.fromBER(c)),
-      trustedCerts: caRoots.map((c) => pkijs.Certificate.fromBER(decodeBase64(pemToCert(c)))),
-    });
-
-    const chain = await chainEngine.verify();
-
-    if (!chain.result) {
-      throw new Error(`Invalid certificate chain: ${chain.resultMessage}`);
-    }
-
-    const x509Cert = `-----BEGIN CERTIFICATE-----
-${encodeBase64(this.x5chain[0])}
------END CERTIFICATE-----`;
-
-    const key = await importX509(
-      x509Cert,
-      this.algName as string);
-
-    return this.verify(key, bodyProtectedHeaders, payload);
+    return verify(this.algName, key, this.signature, toBeSigned);
   }
 }

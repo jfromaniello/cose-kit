@@ -1,3 +1,5 @@
+import { KeyLike } from "jose"
+
 /**
  * A generic Error that all other COSE specific Error subclasses extend.
  *
@@ -79,4 +81,113 @@ export class COSENotSupported extends COSEError {
   }
 
   code = 'ERR_COSE_NOT_SUPPORTED'
+}
+
+
+/**
+ * An error subclass thrown when a JWKS is invalid.
+ *
+ * @example Checking thrown error is this one using a stable error code
+ *
+ * ```js
+ * if (err.code === 'ERR_JWKS_INVALID') {
+ *   // ...
+ * }
+ * ```
+ *
+ * @example Checking thrown error is this one using `instanceof`
+ *
+ * ```js
+ * if (err instanceof jose.errors.JWKSInvalid) {
+ *   // ...
+ * }
+ * ```
+ */
+export class JWKSInvalid extends COSEError {
+  static get code(): 'ERR_JWKS_INVALID' {
+    return 'ERR_JWKS_INVALID'
+  }
+
+  code = 'ERR_JWKS_INVALID'
+}
+
+/**
+ * An error subclass thrown when no keys match from a JWKS.
+ *
+ * @example Checking thrown error is this one using a stable error code
+ *
+ * ```js
+ * if (err.code === 'ERR_JWKS_NO_MATCHING_KEY') {
+ *   // ...
+ * }
+ * ```
+ *
+ * @example Checking thrown error is this one using `instanceof`
+ *
+ * ```js
+ * if (err instanceof jose.errors.JWKSNoMatchingKey) {
+ *   // ...
+ * }
+ * ```
+ */
+export class JWKSNoMatchingKey extends COSEError {
+  static get code(): 'ERR_JWKS_NO_MATCHING_KEY' {
+    return 'ERR_JWKS_NO_MATCHING_KEY'
+  }
+
+  code = 'ERR_JWKS_NO_MATCHING_KEY'
+
+  message = 'no applicable key found in the JSON Web Key Set'
+}
+
+/**
+ * An error subclass thrown when multiple keys match from a JWKS.
+ *
+ * @example Checking thrown error is this one using a stable error code
+ *
+ * ```js
+ * if (err.code === 'ERR_JWKS_MULTIPLE_MATCHING_KEYS') {
+ *   // ...
+ * }
+ * ```
+ *
+ * @example Checking thrown error is this one using `instanceof`
+ *
+ * ```js
+ * if (err instanceof jose.errors.JWKSMultipleMatchingKeys) {
+ *   // ...
+ * }
+ * ```
+ */
+export class JWKSMultipleMatchingKeys extends COSEError {
+  /** @ignore */
+  [Symbol.asyncIterator]!: () => AsyncIterableIterator<KeyLike>
+
+  static get code(): 'ERR_JWKS_MULTIPLE_MATCHING_KEYS' {
+    return 'ERR_JWKS_MULTIPLE_MATCHING_KEYS'
+  }
+
+  code = 'ERR_JWKS_MULTIPLE_MATCHING_KEYS'
+
+  message = 'multiple matching keys found in the JSON Web Key Set'
+}
+
+export class X509NoMatchingCertificate extends COSEError {
+  static get code(): 'ERR_X509_NO_MATCHING_CERTIFICATE' {
+    return 'ERR_X509_NO_MATCHING_CERTIFICATE'
+  }
+
+  code = 'ERR_X509_NO_MATCHING_CERTIFICATE'
+
+  message = 'no applicable certificate found in the COSE headers'
+}
+
+export class X509InvalidCertificateChain extends COSEError {
+  static get code(): 'ERR_X509_INVALID_CERTIFICATE_CHAIN' {
+    return 'ERR_X509_INVALID_CERTIFICATE_CHAIN'
+  }
+
+  code = 'ERR_X509_INVALID_CERTIFICATE_CHAIN'
+
+  message = 'Invalid X509 certificate chain'
 }

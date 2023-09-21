@@ -18,6 +18,7 @@
     "verbatimModuleSyntax": false,
     "moduleResolution": "node",
     "baseUrl": "../src",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true
   }
 }

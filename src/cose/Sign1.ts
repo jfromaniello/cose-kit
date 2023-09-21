@@ -58,10 +58,10 @@ export class Sign1 extends SignatureBase {
     return joseVerify(this.algName, key, this.signature, toBeSigned);
   }
 
-  public verifyX509(
+  public async verifyX509(
     roots: string[]
   ) {
-    console.dir(roots);
-    throw new Error('not implemented');
+    const key = await this.verifyX509Chain(roots);
+    return this.verify(key);
   }
 }

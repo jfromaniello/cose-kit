@@ -28,8 +28,8 @@ describe('ecdsa-examples', () => {
           Buffer.from(example.output.cbor, 'hex'),
           key
         );
-        console.dir(result);
         expect(result.isValid).toBeTruthy();
+        expect(result.decoded).toMatchSnapshot()
       });
     });
 

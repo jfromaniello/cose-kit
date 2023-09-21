@@ -1,2 +1,6 @@
-export { coseVerify, coseVerifyMultiSignature } from './verify';
+export {
+  coseVerify,
+  coseVerifyX509,
+  coseVerifyMultiSignature,
+} from './verify';
 
