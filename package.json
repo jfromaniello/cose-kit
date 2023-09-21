@@ -32,7 +32,7 @@
   "scripts": {
     "test": "jest --verbose",
     "postinstall": "patch-package",
-    "prepare": "rm -rf dist ; tsc -p ./tsconfig/node-cjs.json",
+    "prepare": "run-s clean:* build:*",
     "build": "tsc",
     "build-all": "run-s build:*",
     "build:node-cjs": "run-s clean:node-cjs 'build -- -p ./tsconfig/node-cjs.json' pkgjson:node-cjs",
