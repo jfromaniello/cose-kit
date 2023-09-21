@@ -1,10 +1,10 @@
 import { Encoder } from 'cbor-x';
-import { headers, algs } from '../constants';
 import { KeyLike, importX509 } from 'jose';
 import { pkijs } from '#runtime/pkijs';
 import { decodeBase64 } from '#runtime/base64';
 import { X509InvalidCertificateChain, X509NoMatchingCertificate } from '../util/errors';
 import { certToPEM, pemToCert } from '../util/cert';
+import { headers, algs } from '../constants';
 
 const encoder = new Encoder({
   tagUint8Array: false,
@@ -34,7 +34,11 @@ export class WithHeaders {
 
   public get protectedHeader(): Map<number, unknown> {
     if (!this.#decodedProtectedHeader) {
-      this.#decodedProtectedHeader = encoder.decode(this.encodedProtectedHeader as Uint8Array);
+      if (!this.encodedProtectedHeader || this.encodedProtectedHeader.byteLength === 0) {
+        this.#decodedProtectedHeader = new Map();
+      } else {
+        this.#decodedProtectedHeader = encoder.decode(this.encodedProtectedHeader as Uint8Array);
+      }
     }
     return this.#decodedProtectedHeader as Map<number, unknown>;
   }

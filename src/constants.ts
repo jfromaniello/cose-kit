@@ -1,3 +1,16 @@
+import { fromUTF8 } from "./lib/buffer_utils";
+import { Encoder } from "cbor-x";
+
+const encoder = new Encoder({
+  tagUint8Array: false,
+  useRecords: false,
+  mapsAsObjects: false,
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  useTag259ForMaps: false,
+});
+
+
 export const algs = new Map<number, { name: string, hash?: string }>(
   [
     [-8, { name: 'EdDSA' }],
@@ -56,4 +69,28 @@ export type ProtectedHeader = {
 export type UnprotectedHeaders = {
   ctyp?: number | string,
   kid: Uint8Array | string,
+};
+
+export const encodeProtectedHeaders = (protectedHeader: ProtectedHeader | undefined) => {
+  if (typeof protectedHeader === 'undefined') {
+    return new Uint8Array();
+  }
+
+  return encoder.encode(new Map(Object.entries(protectedHeader || {}).map(([k, v]: [string, unknown]) => {
+    if (k === 'alg') {
+      v = algsToValue.get(v as string);
+    } else if (typeof v === 'string') {
+      v = fromUTF8(v);
+    }
+    return [headers[k], v];
+  })))
+};
+
+export const mapUnprotectedHeaders = (unprotectedHeader: UnprotectedHeaders | undefined) => {
+  return new Map(Object.entries(unprotectedHeader || {}).map(([k, v]: [string, unknown]) => {
+    if (typeof v === 'string') {
+      v = fromUTF8(v);
+    }
+    return [headers[k], v];
+  }));
 };

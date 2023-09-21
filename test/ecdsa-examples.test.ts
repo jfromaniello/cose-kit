@@ -1,7 +1,9 @@
 import * as fs from 'fs';
 import { getJWKSetFromExample } from './util';
-import { coseVerify, coseVerifyMultiSignature, coseSign } from '../src';
-import { importJWK } from 'jose';
+import { coseVerify, coseVerifyMultiSignature, coseSign, coseMultiSign, Sign } from '../src';
+import { JWK, importJWK } from 'jose';
+type VerificationResult = Awaited<ReturnType<typeof coseVerify> | ReturnType<typeof coseVerifyMultiSignature>>;
+
 const examples = [
   `${__dirname}/Examples/ecdsa-examples/ecdsa-sig-01.json`,
   `${__dirname}/Examples/ecdsa-examples/ecdsa-sig-02.json`,
@@ -17,52 +19,77 @@ const examples = [
 ].map((examplePath) => JSON.parse(fs.readFileSync(examplePath, 'utf8')));
 
 describe('ecdsa-examples', () => {
-
   examples.forEach(example => {
-
     describe(example.title, () => {
-      it('should verify the signature', async () => {
-        const key = getJWKSetFromExample(example);
-        const verifyFunc = example.input.sign0 ? coseVerify : coseVerifyMultiSignature;
-        const result = await verifyFunc(
+      const getPublicKey = getJWKSetFromExample(example);
+      const verifyFunc = example.input.sign0 ? coseVerify : coseVerifyMultiSignature;
+      let exampleSignatureVerificationResult: VerificationResult;
+
+      beforeAll(async () => {
+        exampleSignatureVerificationResult = await verifyFunc(
           Buffer.from(example.output.cbor, 'hex'),
-          key
+          getPublicKey
         );
-        expect(result.isValid).toBeTruthy();
-        expect(result.decoded).toMatchSnapshot()
       });
 
-      if (example.input.sign0) {
-        it('can generate the signature as the example', async () => {
-          const getPublicKey = getJWKSetFromExample(example);
-          const verifyFunc = example.input.sign0 ? coseVerify : coseVerifyMultiSignature;
-          const result = await verifyFunc(
-            Buffer.from(example.output.cbor, 'hex'),
-            getPublicKey
-          );
+      it('should verify the example signature', async () => {
+        expect(exampleSignatureVerificationResult.isValid).toBeTruthy();
+      });
 
-          const key = await importJWK(example.input.sign0.key);
-          const sign1 = await coseSign(
-            example.input.sign0.protected,
-            example.input.sign0.unprotected,
-            Buffer.from(example.input.plaintext, 'utf8'),
-            key
-          );
+      it('should properly decode the payload', () => {
+        expect(exampleSignatureVerificationResult.decoded).toMatchSnapshot();
+      })
 
-          const result2 = await verifyFunc(sign1, getPublicKey);
+      describe('when signing the example', () => {
+        let signatureVerificationResult: VerificationResult;
 
-          expect(result2.isValid).toBeTruthy();
-          expect(result.isValid).toBeTruthy();
-
-          expect(result2.decoded.protectedHeader)
-            .toMatchObject(result.decoded.protectedHeader);
-          expect(result2.decoded.unprotectedHeader)
-            .toMatchObject(result.decoded.unprotectedHeader);
-          expect(result2.decoded.payload)
-            .toMatchObject(result.decoded.payload);
+        beforeAll(async () => {
+          let signed: Uint8Array;
+          if (example.input.sign0) {
+            signed = await coseSign(
+              example.input.sign0.protected,
+              example.input.sign0.unprotected,
+              Buffer.from(example.input.plaintext, 'utf8'),
+              await importJWK(example.input.sign0.key)
+            );
+          } else {
+            const signers = await Promise.all(
+              example.input.sign.signers.map(async (signer: { key: JWK; protected: unknown; unprotected: unknown; }) => {
+                return {
+                  key: await importJWK(signer.key),
+                  protectedHeader: signer.protected,
+                  unprotectedHeader: signer.unprotected,
+                };
+              }
+              )
+            );
+            signed = await coseMultiSign(
+              example.input.sign.protected,
+              example.input.sign.unprotected,
+              Buffer.from(example.input.plaintext, 'utf8'),
+              signers
+            );
+          }
+          signatureVerificationResult = await verifyFunc(signed, getPublicKey);
         });
-      }
 
+        it('should generate a valid signature', async () => {
+          expect(signatureVerificationResult.isValid).toBeTruthy();
+        });
+
+        it('should encode as the example', () => {
+          if (exampleSignatureVerificationResult.decoded instanceof Sign) {
+            expect((signatureVerificationResult.decoded as Sign).signatures.length)
+              .toBe(exampleSignatureVerificationResult.decoded.signatures.length);
+          }
+          expect(signatureVerificationResult.decoded.protectedHeader)
+            .toMatchObject(exampleSignatureVerificationResult.decoded.protectedHeader);
+          expect(signatureVerificationResult.decoded.unprotectedHeader)
+            .toMatchObject(exampleSignatureVerificationResult.decoded.unprotectedHeader);
+          expect(signatureVerificationResult.decoded.payload)
+            .toMatchObject(exampleSignatureVerificationResult.decoded.payload);
+        });
+      });
     });
   });
 

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ecdsa-examples ECDSA-01: ECDSA - P-256 - sign0 should verify the signature 1`] = `
+exports[`ecdsa-examples ECDSA-01: ECDSA - P-256 - sign0 should properly decode the payload 1`] = `
 Sign1 {
   "encodedProtectedHeader": {
     "data": [
@@ -118,7 +118,7 @@ Sign1 {
 }
 `;
 
-exports[`ecdsa-examples ECDSA-01: ECDSA - P-256 should verify the signature 1`] = `
+exports[`ecdsa-examples ECDSA-01: ECDSA - P-256 should properly decode the payload 1`] = `
 Sign {
   "encodedProtectedHeader": {
     "data": [
@@ -247,7 +247,7 @@ Sign {
 }
 `;
 
-exports[`ecdsa-examples ECDSA-02: ECDSA - P-384 should verify the signature 1`] = `
+exports[`ecdsa-examples ECDSA-02: ECDSA - P-384 should properly decode the payload 1`] = `
 Sign {
   "encodedProtectedHeader": {
     "data": [],
@@ -407,7 +407,7 @@ Sign {
 }
 `;
 
-exports[`ecdsa-examples ECDSA-03: ECDSA - P-512 - sign0 should verify the signature 1`] = `
+exports[`ecdsa-examples ECDSA-03: ECDSA - P-512 - sign0 should properly decode the payload 1`] = `
 Sign1 {
   "encodedProtectedHeader": {
     "data": [
@@ -620,7 +620,7 @@ Sign1 {
 }
 `;
 
-exports[`ecdsa-examples ECDSA-03: ECDSA - P-512 should verify the signature 1`] = `
+exports[`ecdsa-examples ECDSA-03: ECDSA - P-512 should properly decode the payload 1`] = `
 Sign {
   "encodedProtectedHeader": {
     "data": [],
@@ -842,7 +842,7 @@ Sign {
 }
 `;
 
-exports[`ecdsa-examples ECDSA-sig-02: ECDSA - P-384 - sign1 should verify the signature 1`] = `
+exports[`ecdsa-examples ECDSA-sig-02: ECDSA - P-384 - sign1 should properly decode the payload 1`] = `
 Sign1 {
   "encodedProtectedHeader": {
     "data": [
