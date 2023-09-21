@@ -9,6 +9,9 @@ export const parseJWK = (jwk: object): JWK => {
     result[k.replace('_hex', '')] = Buffer.from(result[k] as string, 'hex').toString('base64');
     delete result[k]
   });
+  if (result.kty === 'EC2') {
+    result.kty = 'EC';
+  }
   return result;
 };
 

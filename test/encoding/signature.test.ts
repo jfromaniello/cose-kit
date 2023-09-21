@@ -1,4 +1,4 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import { encoder } from '../../src/cbor';
 import { Signature } from '../../src/cose/Sign';
 

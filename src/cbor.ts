@@ -17,8 +17,7 @@ addExtension({
   Class: Sign,
   tag: 98,
   encode(instance: Sign) {
-    // return instance.encode();
-    throw new Error('not implemented');
+    return instance.encode();
   },
   decode: (data: [Uint8Array, Map<number, unknown>, Uint8Array, ConstructorParameters<typeof Sign>[]]) => {
     const signatures = data[3].map(signature => new Signature(signature[0], signature[1], signature[2]));

@@ -3,7 +3,7 @@ import { SignatureBase } from './SignatureBase';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import joseVerify from "jose/verify";
+import joseVerify from "#runtime/verify";
 import { KeyLike } from 'jose';
 import { COSEVerifyGetKey } from '../jwks/local';
 
@@ -47,7 +47,7 @@ export class Sign1 extends SignatureBase {
     const toBeSigned = encoder.encode([
       'Signature1',
       this.encodedProtectedHeader,
-      Buffer.alloc(0),
+      new Uint8Array(),
       this.payload,
     ]);
 
@@ -56,5 +56,12 @@ export class Sign1 extends SignatureBase {
     }
 
     return joseVerify(this.algName, key, this.signature, toBeSigned);
+  }
+
+  public verifyX509(
+    roots: string[]
+  ) {
+    console.dir(roots);
+    throw new Error('not implemented');
   }
 }

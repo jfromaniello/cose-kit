@@ -82,4 +82,18 @@ export class SignatureBase extends WithHeaders {
       this.unprotectedHeader.get(headers.kid) as Uint8Array;
   }
 
+  public get x5bag(): Uint8Array[] | undefined {
+    const x5bag = this.protectedHeader.get(headers.x5bag) ||
+      this.unprotectedHeader.get(headers.x5bag);
+    if (!x5bag) { return }
+    return Array.isArray(x5bag) ? x5bag : [x5bag];
+  }
+
+  public get x5chain(): Uint8Array[] | undefined {
+    const x5chain = this.protectedHeader.get(headers.x5chain) ||
+      this.unprotectedHeader.get(headers.x5chain);
+    if (!x5chain) { return }
+    return Array.isArray(x5chain) ? x5chain : [x5chain];
+  }
+
 }

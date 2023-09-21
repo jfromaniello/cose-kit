@@ -1,4 +1,4 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import { getJWKSetFromExample } from './util';
 import { coseVerify, coseVerifyMultiSignature } from '../src/verify';
 
@@ -28,6 +28,7 @@ describe('ecdsa-examples', () => {
           Buffer.from(example.output.cbor, 'hex'),
           key
         );
+        console.dir(result);
         expect(result.isValid).toBeTruthy();
       });
     });

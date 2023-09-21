@@ -1,0 +1,7 @@
+{
+  "extends": "./node-cjs.json",
+  "compilerOptions": {
+    "module": "ES2020",
+    "outDir": "../dist/node/esm"
+  }
+}

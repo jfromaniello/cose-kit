@@ -24,5 +24,9 @@ export const headers = {
   kid: 4,
   IV: 5,
   Partial_IV: 6,
-  counter_signature: 7
+  counter_signature: 7,
+  x5bag: 32,
+  x5chain: 33,
+  x5t: 34,
+  x5u: 35,
 };

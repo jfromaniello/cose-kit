@@ -1,0 +1,14 @@
+import type { KeyLike } from 'jose'
+import webcrypto, { isCryptoKey } from './webcrypto'
+import isKeyObject from './is_key_object'
+
+export default (key: unknown): key is KeyLike => isKeyObject(key) || isCryptoKey(key)
+
+const types = ['KeyObject']
+
+// @ts-ignore
+if (globalThis.CryptoKey || webcrypto?.CryptoKey) {
+  types.push('CryptoKey')
+}
+
+export { types }

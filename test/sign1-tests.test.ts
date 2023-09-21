@@ -1,4 +1,4 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import { getPublicJWK } from './util';
 import { coseVerify } from '../src/verify';
 import { KeyLike, importJWK } from 'jose';
