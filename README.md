@@ -28,6 +28,25 @@ const cose = Buffer.from(coseHEX, 'hex');
 const { isValid } = await coseVerifyMultiSignature(cose, [ key ]);
 ```
 
+
+X509 certificates:
+
+```js
+const { coseVerifyX509 }  = require('cose');
+
+const caRoots = [
+  `-----BEGIN CERTIFICATE-----...`
+];
+
+const cose = Buffer.from(coseHEX, 'hex');
+
+const { isValid } = await coseVerifyX509(cose, caRoots);
+```
+
+
+
+
+
 ## Credits
 -  [panva/jose](https://github.com/panva/jose) A node.js library for JOSE.
 

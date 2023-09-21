@@ -21,6 +21,12 @@ export const getPublicJWK = (jwk: JWK): JWK => {
   return publicJWK;
 };
 
+/**
+ * Builds a JWK keyset from an COSE example.
+ *
+ * @param example The COSE example
+ * @returns ReturnType<typeof createLocalJWKSet>
+ */
 export const getJWKSetFromExample = (example: Example) => {
   if (typeof example.input.sign !== 'undefined') {
     return createLocalJWKSet({
