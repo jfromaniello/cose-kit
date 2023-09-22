@@ -95,8 +95,7 @@ describe('x509-examples', () => {
         payload,
         key
       );
-      // @ts-ignore
-      console.log(signed.toString('hex'));
+      console.log(Buffer.from(signed).toString('hex'));
       await expect(coseVerifyX509(signed, caRoots))
         .rejects
         .toThrowErrorMatchingSnapshot();
