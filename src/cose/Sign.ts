@@ -1,4 +1,4 @@
-import { Encoder } from 'cbor-x';
+import { Encoder, } from 'cbor-x';
 import { SignatureBase, WithHeaders } from './SignatureBase';
 import { KeyLike } from 'jose';
 import verify from "#runtime/verify";
@@ -6,15 +6,7 @@ import { COSEVerifyGetKey } from '../jwks/local';
 import { UnprotectedHeaders, ProtectedHeader } from '../headers';
 import sign from '#runtime/sign';
 import { mapUnprotectedHeaders, encodeProtectedHeaders } from '../headers';
-
-const encoder = new Encoder({
-  tagUint8Array: false,
-  useRecords: false,
-  mapsAsObjects: false,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  useTag259ForMaps: false,
-});
+import { encoder, addExtension } from '../cbor';
 
 export class Sign extends WithHeaders {
   constructor(
@@ -25,9 +17,8 @@ export class Sign extends WithHeaders {
     super(protectedHeader, unprotectedHeader);
   }
 
-
-  public encode() {
-    return encoder.encode([
+  public encode(extEncoder: Encoder) {
+    return extEncoder.encode([
       this.encodedProtectedHeader,
       this.unprotectedHeader,
       this.payload,
@@ -175,3 +166,15 @@ export class Signature extends SignatureBase {
   }
 
 }
+
+addExtension(extEncoder => ({
+  Class: Sign,
+  tag: 98,
+  encode(instance: Sign) {
+    return instance.encode(extEncoder);
+  },
+  decode: (data: [Uint8Array, Map<number, unknown>, Uint8Array, ConstructorParameters<typeof Sign>[]]) => {
+    const signatures = data[3].map(signature => new Signature(signature[0], signature[1], signature[2]));
+    return new Sign(data[0], data[1], data[2], signatures);
+  }
+}))

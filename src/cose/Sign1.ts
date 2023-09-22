@@ -1,4 +1,3 @@
-import { Encoder } from 'cbor-x';
 import verify from "#runtime/verify";
 import { KeyLike } from 'jose';
 import { COSEVerifyGetKey } from '../jwks/local';
@@ -6,15 +5,8 @@ import { ProtectedHeader, UnprotectedHeaders, algsToValue, headers } from '../he
 import sign from '#runtime/sign';
 import { fromUTF8 } from '../lib/buffer_utils';
 import { SignatureBase } from './SignatureBase';
-
-const encoder = new Encoder({
-  tagUint8Array: false,
-  useRecords: false,
-  mapsAsObjects: false,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  useTag259ForMaps: false,
-});
+import { encoder, addExtension } from '../cbor';
+import { Encoder } from "cbor-x";
 
 export class Sign1 extends SignatureBase {
   constructor(
@@ -26,8 +18,8 @@ export class Sign1 extends SignatureBase {
     super(protectedHeader, unprotectedHeader, signature);
   }
 
-  public encode() {
-    return encoder.encode([
+  public encode(extEncoder: Encoder) {
+    return extEncoder.encode([
       this.encodedProtectedHeader,
       this.unprotectedHeader,
       this.payload,
@@ -121,3 +113,14 @@ export class Sign1 extends SignatureBase {
     );
   }
 }
+
+addExtension(extEncoder => ({
+  Class: Sign1,
+  tag: 18,
+  encode(instance: Sign1) {
+    return instance.encode(extEncoder);
+  },
+  decode: (data: ConstructorParameters<typeof Sign1>) => {
+    return new Sign1(data[0], data[1], data[2], data[3]);
+  }
+}));
