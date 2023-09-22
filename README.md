@@ -48,11 +48,11 @@ Signing a payload:
 
 ```js
 const { importJWK } = require('jose');
-const { sign }  = require('cose');
+const { coseSign }  = require('cose');
 
 const key = await importJWK(jwk);
 
-const cose = await sign(
+const cose = await coseSign(
   { alg: 'ES256' },
   { ctyp: 0 },
   'hello world',
