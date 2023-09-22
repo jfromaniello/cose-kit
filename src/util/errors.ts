@@ -188,6 +188,4 @@ export class X509InvalidCertificateChain extends COSEError {
   }
 
   code = 'ERR_X509_INVALID_CERTIFICATE_CHAIN'
-
-  message = 'Invalid X509 certificate chain'
 }

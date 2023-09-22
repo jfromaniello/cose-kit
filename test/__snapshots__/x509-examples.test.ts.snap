@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`x509-examples sign with an expired cert in x5chain should fail to verify 1`] = `"The certificate is either not yet valid or expired"`;

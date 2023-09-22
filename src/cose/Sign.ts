@@ -3,9 +3,9 @@ import { SignatureBase, WithHeaders } from './SignatureBase';
 import { KeyLike } from 'jose';
 import verify from "#runtime/verify";
 import { COSEVerifyGetKey } from '../jwks/local';
-import { UnprotectedHeaders, ProtectedHeader } from '../constants';
+import { UnprotectedHeaders, ProtectedHeader } from '../headers';
 import sign from '#runtime/sign';
-import { mapUnprotectedHeaders, encodeProtectedHeaders } from '../constants';
+import { mapUnprotectedHeaders, encodeProtectedHeaders } from '../headers';
 
 const encoder = new Encoder({
   tagUint8Array: false,

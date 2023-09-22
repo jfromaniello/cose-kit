@@ -2,7 +2,7 @@ import { Encoder } from 'cbor-x';
 import verify from "#runtime/verify";
 import { KeyLike } from 'jose';
 import { COSEVerifyGetKey } from '../jwks/local';
-import { ProtectedHeader, UnprotectedHeaders, algsToValue, headers } from '../constants';
+import { ProtectedHeader, UnprotectedHeaders, algsToValue, headers } from '../headers';
 import sign from '#runtime/sign';
 import { fromUTF8 } from '../lib/buffer_utils';
 import { SignatureBase } from './SignatureBase';

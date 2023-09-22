@@ -1,5 +1,15 @@
 import * as fs from 'fs';
+import crypto from 'crypto';
+
 import { coseVerifyX509 } from '../src/verify';
+import { Sign, coseMultiSign, coseSign } from '../src';
+import { JWK, importJWK } from 'jose';
+import { parseJWK } from './util';
+import { headers } from '../src/headers';
+
+const caRoots = [
+  fs.readFileSync(`${__dirname}/Examples/x509-examples/ca.crt`, 'utf8')
+];
 
 const examples = [
   `${__dirname}/Examples/x509-examples/signed-03.json`,
@@ -11,20 +21,85 @@ describe('x509-examples', () => {
   examples.forEach(example => {
 
     describe(example.title, () => {
+
       it('should verify the signature', async () => {
-        // test/Examples/x509-examples/alice.crt
-        const ca = fs.readFileSync(`${__dirname}/Examples/x509-examples/ca.crt`, 'utf8')
-        // const cert = await importX509(x509, 'ES256');
-        // console.dir(cert);
-        // const key = getJWKSetFromExample(example);
         const result = await coseVerifyX509(
           Buffer.from(example.output.cbor, 'hex'),
-          [ca]
+          caRoots
         );
         expect(result.isValid).toBeTruthy();
+      });
+
+      describe('when signing a certificate with x5chain', () => {
+        let signatureVerificationResult: Awaited<ReturnType<typeof coseVerifyX509>>;
+
+        beforeAll(async () => {
+          let signed: Uint8Array;
+          if (example.input.sign0) {
+            signed = await coseSign(
+              example.input.sign0.protected,
+              example.input.sign0.unprotected,
+              Buffer.from(example.input.plaintext, 'utf8'),
+              await importJWK(parseJWK(example.input.sign0.key))
+            );
+          } else {
+            const signers = await Promise.all(
+              example.input.sign.signers.map(async (signer: { key: JWK; protected: unknown; unprotected: { x5chain?: string }; }) => {
+                return {
+                  key: await importJWK(parseJWK(signer.key)),
+                  protectedHeader: signer.protected,
+                  unprotectedHeader: {
+                    ...signer.unprotected || {},
+                    x5chain: signer.unprotected?.x5chain ? Buffer.from(signer.unprotected?.x5chain, 'hex') : undefined
+                  },
+                };
+              }
+              )
+            );
+            signed = await coseMultiSign(
+              example.input.sign.protected,
+              example.input.sign.unprotected,
+              Buffer.from(example.input.plaintext, 'utf8'),
+              signers
+            );
+          }
+          signatureVerificationResult = await coseVerifyX509(signed, caRoots);
+        });
+
+        it('should verify the signature', async () => {
+          expect(signatureVerificationResult.isValid).toBeTruthy();
+        });
+
+        it('should contain the x5chain', () => {
+          const current = ((signatureVerificationResult.decoded as Sign)
+            .signatures[0]
+            .unprotectedHeader
+            .get(headers.x5chain) as Buffer).toString('hex').toUpperCase();
+          const expected = example.input.sign0?.unprotected?.x5chain || example.input.sign?.signers[0].unprotected.x5chain;
+          expect(current).toBe(expected);
+        });
+
       });
     });
 
   });
 
+  describe('sign with an expired cert in x5chain', () => {
+    const key = crypto.createPrivateKey(fs.readFileSync(`${__dirname}/Examples/x509-examples/expired.key`, 'utf8'));
+    const x5chain = fs.readFileSync(`${__dirname}/Examples/x509-examples/expired.der`);
+    const payload = Buffer.from('Hello World!');
+    it('should fail to verify', async () => {
+      const signed = await coseSign(
+        { alg: 'ES256' },
+        { x5chain },
+        payload,
+        key
+      );
+      // @ts-ignore
+      console.log(signed.toString('hex'));
+      await expect(coseVerifyX509(signed, caRoots))
+        .rejects
+        .toThrowErrorMatchingSnapshot();
+    });
+  });
 });

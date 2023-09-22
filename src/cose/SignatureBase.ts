@@ -4,7 +4,7 @@ import { pkijs } from '#runtime/pkijs';
 import { decodeBase64 } from '#runtime/base64';
 import { X509InvalidCertificateChain, X509NoMatchingCertificate } from '../util/errors';
 import { certToPEM, pemToCert } from '../util/cert';
-import { headers, algs } from '../constants';
+import { headers, algs } from '../headers';
 
 const encoder = new Encoder({
   tagUint8Array: false,
@@ -108,20 +108,22 @@ export class SignatureBase extends WithHeaders {
   async verifyX509Chain(
     caRoots: string[],
   ): Promise<KeyLike> {
-    if (!this.x5chain || this.x5chain.length === 0) { throw new X509NoMatchingCertificate(); }
+    const { x5chain } = this;
+
+    if (!x5chain || x5chain.length === 0) { throw new X509NoMatchingCertificate(); }
 
     const chainEngine = new pkijs.CertificateChainValidationEngine({
-      certs: this.x5chain.map((c) => pkijs.Certificate.fromBER(c)),
+      certs: x5chain.map((c) => pkijs.Certificate.fromBER(c)),
       trustedCerts: caRoots.map((c) => pkijs.Certificate.fromBER(decodeBase64(pemToCert(c)))),
     });
 
     const chain = await chainEngine.verify();
 
     if (!chain.result) {
-      throw new X509InvalidCertificateChain(`Invalid certificate chain: ${chain.resultMessage}`);
+      throw new X509InvalidCertificateChain(chain.resultMessage);
     }
 
-    const x509Cert = certToPEM(this.x5chain[0]);
+    const x509Cert = certToPEM(x5chain[0]);
 
     return importX509(
       x509Cert,

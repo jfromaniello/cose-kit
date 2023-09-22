@@ -10,7 +10,6 @@ const encoder = new Encoder({
   useTag259ForMaps: false,
 });
 
-
 export const algs = new Map<number, { name: string, hash?: string }>(
   [
     [-8, { name: 'EdDSA' }],
@@ -68,7 +67,8 @@ export type ProtectedHeader = {
 
 export type UnprotectedHeaders = {
   ctyp?: number | string,
-  kid: Uint8Array | string,
+  kid?: Uint8Array | string,
+  x5chain?: Uint8Array | Uint8Array[],
 };
 
 export const encodeProtectedHeaders = (protectedHeader: ProtectedHeader | undefined) => {
