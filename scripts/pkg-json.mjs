@@ -23,10 +23,7 @@ if (tsConfig.compilerOptions.module.startsWith('ES')) {
   result.type = 'module';
 }
 
-result.imports = Object.fromEntries(
-  Object.entries(tsConfig.compilerOptions.paths).map(([key, [value]]) => [key, value.replace(/\*$/, '*.js')])
-)
-
+result.imports = tsConfig.compilerOptions.paths;
 
 console.log(JSON.stringify(result, null, 2));
 
