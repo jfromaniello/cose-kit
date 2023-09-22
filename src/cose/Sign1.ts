@@ -1,11 +1,11 @@
-import verify from "#runtime/verify";
+import verify from "#runtime/verify.js";
 import { KeyLike } from 'jose';
-import { COSEVerifyGetKey } from '../jwks/local';
-import { ProtectedHeader, UnprotectedHeaders, algsToValue, headers } from '../headers';
-import sign from '#runtime/sign';
-import { fromUTF8 } from '../lib/buffer_utils';
-import { SignatureBase } from './SignatureBase';
-import { encoder, addExtension } from '../cbor';
+import { COSEVerifyGetKey } from '../jwks/local.js';
+import { ProtectedHeader, UnprotectedHeaders, algsToValue, headers } from '../headers.js';
+import sign from '#runtime/sign.js';
+import { fromUTF8 } from '../lib/buffer_utils.js';
+import { SignatureBase } from './SignatureBase.js';
+import { encoder, addExtension } from '../cbor.js';
 import { Encoder } from "cbor-x";
 
 export class Sign1 extends SignatureBase {

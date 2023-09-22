@@ -1,4 +1,4 @@
-import { encodeBase64 } from '#runtime/base64';
+import { encodeBase64 } from '#runtime/base64.js';
 
 export const pemToCert = (cert: string): string => {
   const pem = /-----BEGIN (\w*)-----([^-]*)-----END (\w*)-----/g.exec(cert.toString());

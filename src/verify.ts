@@ -1,8 +1,8 @@
-import { COSEVerifyGetKey } from "./jwks/local";
-import { encoder } from "./cbor";
-import { Sign1 } from "./cose/Sign1";
 import { KeyLike } from "jose";
-import { Sign } from "./cose/Sign";
+import { COSEVerifyGetKey } from "./jwks/local.js";
+import { encoder } from "./cbor.js";
+import { Sign1 } from "./cose/Sign1.js";
+import { Sign } from "./cose/Sign.js";
 
 type VerifyResult = {
   isValid: boolean;

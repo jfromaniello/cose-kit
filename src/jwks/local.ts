@@ -10,13 +10,13 @@ import {
   COSENotSupported,
   JWKSNoMatchingKey,
   JWKSMultipleMatchingKeys,
-} from '../util/errors'
+} from '../util/errors.js'
 
-import { SignatureBase } from '../cose/SignatureBase';
+import { SignatureBase } from '../cose/SignatureBase.js';
 
-import isObject from '../lib/is_object'
+import isObject from '../lib/is_object.js';
 
-import { toUTF8 } from '../lib/buffer_utils';
+import { toUTF8 } from '../lib/buffer_utils.js';
 
 function getKtyFromAlg(alg: unknown) {
   switch (typeof alg === 'string' && alg.slice(0, 2)) {

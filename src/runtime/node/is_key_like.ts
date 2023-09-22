@@ -1,6 +1,6 @@
 import type { KeyLike } from 'jose'
-import webcrypto, { isCryptoKey } from './webcrypto'
-import isKeyObject from './is_key_object'
+import webcrypto, { isCryptoKey } from './webcrypto.js';
+import isKeyObject from './is_key_object.js';
 
 export default (key: unknown): key is KeyLike => isKeyObject(key) || isCryptoKey(key)
 

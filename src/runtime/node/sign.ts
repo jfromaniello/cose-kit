@@ -2,10 +2,10 @@ import * as crypto from 'crypto'
 import { promisify } from 'util'
 
 import type { SignFunction } from '../interfaces.d'
-import nodeDigest from './dsa_digest'
-import hmacDigest from './hmac_digest'
-import nodeKey from './node_key'
-import getSignKey from './get_sign_verify_key'
+import nodeDigest from './dsa_digest.js';
+import hmacDigest from './hmac_digest.js';
+import nodeKey from './node_key.js';
+import getSignKey from './get_sign_verify_key.js';
 
 let oneShotSign: (
   alg: string | undefined,

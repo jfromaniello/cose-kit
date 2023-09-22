@@ -1,10 +1,10 @@
 import { Encoder } from 'cbor-x';
 import { KeyLike, importX509 } from 'jose';
-import { pkijs } from '#runtime/pkijs';
-import { decodeBase64 } from '#runtime/base64';
-import { X509InvalidCertificateChain, X509NoMatchingCertificate } from '../util/errors';
-import { certToPEM, pemToCert } from '../util/cert';
-import { headers, algs } from '../headers';
+import { pkijs } from '#runtime/pkijs.js';
+import { decodeBase64 } from '#runtime/base64.js';
+import { X509InvalidCertificateChain, X509NoMatchingCertificate } from '../util/errors.js';
+import { certToPEM, pemToCert } from '../util/cert.js';
+import { headers, algs } from '../headers.js';
 
 const encoder = new Encoder({
   tagUint8Array: false,

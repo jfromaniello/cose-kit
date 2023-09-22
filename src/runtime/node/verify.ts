@@ -2,11 +2,11 @@ import * as crypto from 'crypto'
 import { promisify } from 'util'
 
 import type { VerifyFunction } from '../interfaces.d'
-import nodeDigest from './dsa_digest'
-import nodeKey from './node_key'
-import sign from './sign'
-import getVerifyKey from './get_sign_verify_key'
-import { oneShotCallback } from './flags'
+import nodeDigest from './dsa_digest.js'
+import nodeKey from './node_key.js'
+import sign from './sign.js'
+import getVerifyKey from './get_sign_verify_key.js'
+import { oneShotCallback } from './flags.js'
 
 let oneShotVerify: (
   alg: string | undefined,

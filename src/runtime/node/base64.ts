@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer'
-import { decoder } from '../../lib/buffer_utils'
+import { decoder } from '../../lib/buffer_utils.js'
 
 let encode: (input: Uint8Array | string) => string
 

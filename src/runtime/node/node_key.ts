@@ -1,10 +1,10 @@
 import { constants } from 'crypto'
 import type { KeyObject, SignKeyObjectInput } from 'crypto'
 
-import getNamedCurve from './get_named_curve'
-import { COSENotSupported } from '../../util/errors'
-import checkModulusLength from './check_modulus_length'
-import { rsaPssParams } from './flags'
+import getNamedCurve from './get_named_curve.js';
+import { COSENotSupported } from '../../util/errors.js';
+import checkModulusLength from './check_modulus_length.js';
+import { rsaPssParams } from './flags.js';
 
 const PSS = {
   padding: constants.RSA_PKCS1_PSS_PADDING,

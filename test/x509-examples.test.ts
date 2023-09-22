@@ -1,11 +1,11 @@
 import * as fs from 'fs';
 import crypto from 'crypto';
 
-import { coseVerifyX509 } from '../src/verify';
-import { Sign, coseMultiSign, coseSign } from '../src';
+import { coseVerifyX509 } from '../src/verify.js';
+import { Sign, coseMultiSign, coseSign } from '../src/index.js';
 import { JWK, importJWK } from 'jose';
-import { parseJWK } from './util';
-import { headers } from '../src/headers';
+import { parseJWK } from './util.js';
+import { headers } from '../src/headers.js';
 
 const caRoots = [
   fs.readFileSync(`${__dirname}/Examples/x509-examples/ca.crt`, 'utf8')

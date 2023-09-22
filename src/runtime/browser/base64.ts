@@ -1,4 +1,4 @@
-import { encoder, decoder } from '../../lib/buffer_utils'
+import { encoder, decoder } from '../../lib/buffer_utils.js'
 
 export const encodeBase64 = (input: Uint8Array | string) => {
   let unencoded = input

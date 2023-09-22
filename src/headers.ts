@@ -1,4 +1,4 @@
-import { fromUTF8 } from "./lib/buffer_utils";
+import { fromUTF8 } from "./lib/buffer_utils.js";
 import { Encoder } from "cbor-x";
 
 const encoder = new Encoder({

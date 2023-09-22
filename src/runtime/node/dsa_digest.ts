@@ -1,4 +1,4 @@
-import { COSENotSupported } from '../../util/errors';
+import { COSENotSupported } from '../../util/errors.js';
 
 export default function dsaDigest(alg: string) {
   switch (alg) {

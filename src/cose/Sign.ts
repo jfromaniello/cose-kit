@@ -1,12 +1,11 @@
 import { Encoder, } from 'cbor-x';
-import { SignatureBase, WithHeaders } from './SignatureBase';
+import { SignatureBase, WithHeaders } from './SignatureBase.js';
 import { KeyLike } from 'jose';
-import verify from "#runtime/verify";
-import { COSEVerifyGetKey } from '../jwks/local';
-import { UnprotectedHeaders, ProtectedHeader } from '../headers';
-import sign from '#runtime/sign';
-import { mapUnprotectedHeaders, encodeProtectedHeaders } from '../headers';
-import { encoder, addExtension } from '../cbor';
+import verify from "#runtime/verify.js";
+import { COSEVerifyGetKey } from '../jwks/local.js';
+import { UnprotectedHeaders, ProtectedHeader, mapUnprotectedHeaders, encodeProtectedHeaders } from '../headers.js';
+import sign from '#runtime/sign.js';
+import { encoder, addExtension } from '../cbor.js';
 
 export class Sign extends WithHeaders {
   constructor(

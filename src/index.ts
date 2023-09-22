@@ -1,13 +1,13 @@
-import { Sign } from './cose/Sign';
-import { Sign1 } from './cose/Sign1';
+import { Sign } from './cose/Sign.js';
+import { Sign1 } from './cose/Sign1.js';
 export {
   coseVerify,
   coseVerifyX509,
   coseVerifyMultiSignature,
-} from './verify';
-export { Sign1 } from './cose/Sign1';
-export { Sign } from './cose/Sign';
-import { encoder } from './cbor';
+} from './verify.js';
+export { Sign1 } from './cose/Sign1.js';
+export { Sign } from './cose/Sign.js';
+import { encoder } from './cbor.js';
 
 export const coseSign = async (...args: Parameters<typeof Sign1.sign>): Promise<Uint8Array> => {
   const sign1 = await Sign1.sign(...args);
