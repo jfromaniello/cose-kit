@@ -55,7 +55,7 @@ const key = await importJWK(jwk);
 const cose = await coseSign(
   { alg: 'ES256' },
   { ctyp: 0 },
-  'hello world',
+  Buffer.from('hello world', 'utf8'),
   key
 );
 
