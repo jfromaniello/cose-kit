@@ -1,6 +1,6 @@
 import * as fs from 'fs';
-import { encoder } from '../../src/cbor';
-import { Signature } from '../../src/cose/Sign';
+import { encoder } from '../../src/cbor.js';
+import { Signature } from '../../src/cose/Sign.js';
 
 describe('signature', () => {
   const example = JSON.parse(fs.readFileSync('./test/Examples/sign-tests/sign-pass-03.json', 'utf8'));

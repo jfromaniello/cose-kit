@@ -3,8 +3,10 @@ module.exports = {
   preset: 'ts-jest/presets/default-esm', // or other ESM presets
   testEnvironment: 'node',
   testMatch: ['**/test/**/*.test.ts'],
+  extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^(\\#.*)\\.js$': '$1',
   },
   transform: {
     // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`

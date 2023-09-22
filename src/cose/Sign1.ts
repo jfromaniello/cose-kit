@@ -6,7 +6,6 @@ import sign from '#runtime/sign.js';
 import { fromUTF8 } from '../lib/buffer_utils.js';
 import { SignatureBase } from './SignatureBase.js';
 import { encoder, addExtension } from '../cbor.js';
-import { Encoder } from "cbor-x";
 
 export class Sign1 extends SignatureBase {
   constructor(
@@ -18,8 +17,8 @@ export class Sign1 extends SignatureBase {
     super(protectedHeader, unprotectedHeader, signature);
   }
 
-  public encode(extEncoder: Encoder) {
-    return extEncoder.encode([
+  public encode(encodeFn: (obj: unknown) => Uint8Array) {
+    return encodeFn([
       this.encodedProtectedHeader,
       this.unprotectedHeader,
       this.payload,
@@ -114,11 +113,11 @@ export class Sign1 extends SignatureBase {
   }
 }
 
-addExtension(extEncoder => ({
+addExtension(() => ({
   Class: Sign1,
   tag: 18,
-  encode(instance: Sign1) {
-    return instance.encode(extEncoder);
+  encode(instance: Sign1, encodeFn: (obj: unknown) => Uint8Array) {
+    return instance.encode(encodeFn);
   },
   decode: (data: ConstructorParameters<typeof Sign1>) => {
     return new Sign1(data[0], data[1], data[2], data[3]);

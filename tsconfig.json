@@ -1,6 +1,6 @@
 {
   //for vscode
-  "extends": "./tsconfig/node-esm.json",
+  "extends": "./tsconfig/node-cjs.json",
   "compilerOptions": {
     "types": [
       "node",
