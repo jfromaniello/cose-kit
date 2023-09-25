@@ -67,9 +67,17 @@ export class SignatureBase extends WithHeaders {
     return Array.isArray(x5chain) ? x5chain : [x5chain];
   }
 
+  /**
+   * Verify the x5chain content of a message with a given list of certificate authorities.
+   * Returns the publicKey for message validation and
+   * the raw x5chain certificate for further processing.
+   *
+   * @param caRoots the list of certificate authorities in pem format
+   * @returns {Promise<{ publicKey: KeyLike, raw: Uint8Array }>
+   */
   async verifyX509Chain(
     caRoots: string[],
-  ): Promise<KeyLike> {
+  ): Promise<{ publicKey: KeyLike, raw: Uint8Array }> {
     const { x5chain } = this;
 
     if (!x5chain || x5chain.length === 0) { throw new X509NoMatchingCertificate(); }
@@ -87,9 +95,11 @@ export class SignatureBase extends WithHeaders {
 
     const x509Cert = certToPEM(x5chain[0]);
 
-    return importX509(
+    const publicKey = await importX509(
       x509Cert,
       this.algName as string
     );
+
+    return { publicKey, raw: x5chain[0] };
   }
 }
