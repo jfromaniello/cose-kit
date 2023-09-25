@@ -16,6 +16,31 @@ export const algs = new Map<number, { name: string, hash?: string }>(
   ]
 );
 
+/**
+   +-----------+-------+---------+----------+--------------------------+
+   | Name      | Value | Hash    | Tag      | Description              |
+   |           |       |         | Length   |                          |
+   +-----------+-------+---------+----------+--------------------------+
+   | HMAC      | 4     | SHA-256 | 64       | HMAC w/ SHA-256          |
+   | 256/64    |       |         |          | truncated to 64 bits     |
+   | HMAC      | 5     | SHA-256 | 256      | HMAC w/ SHA-256          |
+   | 256/256   |       |         |          |                          |
+   | HMAC      | 6     | SHA-384 | 384      | HMAC w/ SHA-384          |
+   | 384/384   |       |         |          |                          |
+   | HMAC      | 7     | SHA-512 | 512      | HMAC w/ SHA-512          |
+   | 512/512   |       |         |          |                          |
+   +-----------+-------+---------+----------+--------------------------+
+ */
+export const macAlgs = new Map<number, { name: string, hash: string, length?: number }>([
+  [5, { name: 'HS256', hash: 'SHA-256', length: 256 }]
+]);
+
+export const macAlgsToValue = new Map<string, number>(
+  [
+    ['HS256', 5],
+  ]
+);
+
 export const algsToValue = new Map<string, number>(
   [
     ['EdDSA', -8],
@@ -51,6 +76,13 @@ export const headers: { [k: string]: number } = {
 
 export type ProtectedHeader = {
   alg?: 'EdDSA' | 'ES256' | 'ES384' | 'ES512' | 'PS256' | 'PS384' | 'PS512' | 'RS256' | 'RS384' | 'RS512',
+  crit?: number[],
+  ctyp?: number | string,
+  [key: string]: unknown,
+};
+
+export type MacProtectedHeader = {
+  alg?: 'HS256',
   crit?: number[],
   ctyp?: number | string,
   [key: string]: unknown,
