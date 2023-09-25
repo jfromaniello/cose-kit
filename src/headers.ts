@@ -1,14 +1,5 @@
 import { fromUTF8 } from "./lib/buffer_utils.js";
-import { Encoder } from "cbor-x";
-
-const encoder = new Encoder({
-  tagUint8Array: false,
-  useRecords: false,
-  mapsAsObjects: false,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  useTag259ForMaps: false,
-});
+import { encoder } from "./cbor.js";
 
 export const algs = new Map<number, { name: string, hash?: string }>(
   [

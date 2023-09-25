@@ -17,13 +17,17 @@ export class Sign1 extends SignatureBase {
     super(protectedHeader, unprotectedHeader, signature);
   }
 
-  public encode(encodeFn: (obj: unknown) => Uint8Array) {
-    return encodeFn([
+  public getContentForEncoding() {
+    return [
       this.encodedProtectedHeader,
       this.unprotectedHeader,
       this.payload,
       this.signature,
-    ]);
+    ];
+  }
+
+  public encode() {
+    return encoder.encode(this);
   }
 
   private static Signature1(
@@ -113,13 +117,14 @@ export class Sign1 extends SignatureBase {
   }
 }
 
-addExtension(() => ({
+addExtension({
   Class: Sign1,
   tag: 18,
   encode(instance: Sign1, encodeFn: (obj: unknown) => Uint8Array) {
-    return instance.encode(encodeFn);
+    return encodeFn(instance.getContentForEncoding());
   },
   decode: (data: ConstructorParameters<typeof Sign1>) => {
     return new Sign1(data[0], data[1], data[2], data[3]);
   }
-}));
+});
+

@@ -50,7 +50,9 @@ export const coseVerifyX509 = async (
   cose: Uint8Array,
   roots: string[]
 ) => {
+
   const decoded = encoder.decode(cose);
+
   if (!(decoded instanceof Sign1 || decoded instanceof Sign)) {
     throw new Error('unknown COSE type');
   }

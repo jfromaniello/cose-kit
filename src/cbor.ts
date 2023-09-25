@@ -1,6 +1,6 @@
 import { Encoder, addExtension as addExtInt } from 'cbor-x';
 
-export const buildEncoder = () => new Encoder({
+export const encoder = new Encoder({
   tagUint8Array: false,
   useRecords: false,
   mapsAsObjects: false,
@@ -9,12 +9,4 @@ export const buildEncoder = () => new Encoder({
   useTag259ForMaps: false,
 });
 
-export const encoder = buildEncoder();
-
-type addExtensionArgs = Parameters<typeof addExtInt>[0];
-
-export const addExtension = (extCallback: (encoder: Encoder) => addExtensionArgs) => {
-  const extEncoder = buildEncoder();
-  const extParams = extCallback(extEncoder);
-  addExtInt(extParams);
-};
+export const addExtension = addExtInt;

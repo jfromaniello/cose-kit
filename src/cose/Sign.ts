@@ -1,4 +1,3 @@
-import { Encoder, } from 'cbor-x';
 import { SignatureBase, WithHeaders } from './SignatureBase.js';
 import { KeyLike } from 'jose';
 import verify from "#runtime/verify.js";
@@ -16,8 +15,8 @@ export class Sign extends WithHeaders {
     super(protectedHeader, unprotectedHeader);
   }
 
-  public encode(extEncoder: Encoder) {
-    return extEncoder.encode([
+  public getContentForEncoding() {
+    return [
       this.encodedProtectedHeader,
       this.unprotectedHeader,
       this.payload,
@@ -26,7 +25,11 @@ export class Sign extends WithHeaders {
         signature.unprotectedHeader,
         signature.signature
       ]),
-    ]);
+    ];
+  }
+
+  public encode() {
+    return encoder.encode(this);
   }
 
   public async verify(
@@ -166,14 +169,14 @@ export class Signature extends SignatureBase {
 
 }
 
-addExtension(extEncoder => ({
+addExtension({
   Class: Sign,
   tag: 98,
-  encode(instance: Sign) {
-    return instance.encode(extEncoder);
+  encode(instance: Sign, encode: (obj: unknown) => Uint8Array) {
+    return encode(instance.getContentForEncoding());
   },
   decode: (data: [Uint8Array, Map<number, unknown>, Uint8Array, ConstructorParameters<typeof Sign>[]]) => {
     const signatures = data[3].map(signature => new Signature(signature[0], signature[1], signature[2]));
     return new Sign(data[0], data[1], data[2], signatures);
   }
-}))
+});

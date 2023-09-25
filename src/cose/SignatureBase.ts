@@ -1,19 +1,11 @@
-import { Encoder } from 'cbor-x';
 import { KeyLike, importX509 } from 'jose';
 import { pkijs } from '#runtime/pkijs.js';
 import { decodeBase64 } from '#runtime/base64.js';
 import { X509InvalidCertificateChain, X509NoMatchingCertificate } from '../util/errors.js';
 import { certToPEM, pemToCert } from '../util/cert.js';
 import { headers, algs } from '../headers.js';
+import { encoder } from '../cbor.js';
 
-const encoder = new Encoder({
-  tagUint8Array: false,
-  useRecords: false,
-  mapsAsObjects: false,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  useTag259ForMaps: false,
-});
 
 export class WithHeaders {
   #decodedProtectedHeader?: Map<number, unknown>;
