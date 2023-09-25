@@ -25,6 +25,12 @@ const notVerify =
     expect(isValid).toBeFalsy();
   };
 
+const verifies =
+  async (cose: Uint8Array, key: Uint8Array | KeyLike): Promise<void> => {
+    const { isValid } = await coseVerify(cose, key);
+    expect(isValid).toBeTruthy();
+  };
+
 describe('sign1-tests', () => {
   testExample(
     'sign-fail-01.json',
@@ -77,9 +83,7 @@ describe('sign1-tests', () => {
   testExample(
     'sign-pass-03.json',
     'should not verify',
-    (cose, key) => {
-      return expect(coseVerify(cose, key)).rejects.toThrow('unknown COSE type');
-    });
+    verifies);
 });
 
 

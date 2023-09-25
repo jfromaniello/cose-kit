@@ -20,7 +20,7 @@ type MultiSigVerifyResult = {
 /**
  * Verify the signature of a COSE_Sign1 message.
  *
- * @param cose the buffer containing the Cose Sign1 tagged message.
+ * @param cose the buffer containing the Cose Sign1 tagged or untagged message.
  * @param key the key to use to verify the signature.
  * @returns
  */
@@ -28,7 +28,13 @@ export const coseVerify = async (
   cose: Uint8Array,
   key: KeyLike | Uint8Array | COSEVerifyGetKey
 ): Promise<VerifyResult> => {
-  const decoded = encoder.decode(cose);
+  let decoded = encoder.decode(cose);
+
+  if (Array.isArray(decoded) && decoded.length === 4) {
+    //handles an untagged Sign1
+    const params = decoded as ConstructorParameters<typeof Sign1>;
+    decoded = new Sign1(...params);
+  }
 
   if (!(decoded instanceof Sign1)) {
     throw new Error('unknown COSE type');
