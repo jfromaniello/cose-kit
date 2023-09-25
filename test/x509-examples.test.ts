@@ -73,7 +73,7 @@ describe('x509-examples', () => {
         it('should contain the x5chain', () => {
           const current = ((signatureVerificationResult.decoded as Sign)
             .signatures[0]
-            .unprotectedHeader
+            .unprotectedHeaders
             .get(headers.x5chain) as Buffer).toString('hex').toUpperCase();
           const expected = example.input.sign0?.unprotected?.x5chain || example.input.sign?.signers[0].unprotected.x5chain;
           expect(current).toBe(expected);

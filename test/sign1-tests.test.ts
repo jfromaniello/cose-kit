@@ -13,7 +13,6 @@ const testExample = (
   const example = JSON.parse(fs.readFileSync(`${basePath}/${filePath}`, 'utf8'));
   describe(example.title, () => {
     it(testDescription, async () => {
-      console.log(filePath);
       const key = await importJWK(getPublicJWK(example.input.sign0.key));
       const cose = Buffer.from(example.output.cbor, 'hex');
       const externalAAD = example.input.sign0.external ?

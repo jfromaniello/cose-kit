@@ -1,30 +1,30 @@
 import { encoder } from '../cbor.js';
 
 export class WithHeaders {
-  #decodedProtectedHeader?: Map<number, unknown>;
+  #decodedProtectedHeaders?: Map<number, unknown>;
 
-  protected encodedProtectedHeader?: Uint8Array;
+  protected encodedProtectedHeaders?: Uint8Array;
 
   constructor(
-    protectedHeader: Uint8Array | Map<number, unknown>,
-    public readonly unprotectedHeader: Map<number, unknown>) {
-    if (protectedHeader instanceof Uint8Array) {
-      this.encodedProtectedHeader = protectedHeader;
+    protectedHeaders: Uint8Array | Map<number, unknown>,
+    public readonly unprotectedHeaders: Map<number, unknown>) {
+    if (protectedHeaders instanceof Uint8Array) {
+      this.encodedProtectedHeaders = protectedHeaders;
     } else {
-      this.#decodedProtectedHeader = protectedHeader;
+      this.#decodedProtectedHeaders = protectedHeaders;
       // TODO: https://github.com/kriszyp/cbor-x/issues/83
-      this.encodedProtectedHeader = encoder.encode(protectedHeader);
+      this.encodedProtectedHeaders = encoder.encode(protectedHeaders);
     }
   }
 
-  public get protectedHeader(): Map<number, unknown> {
-    if (!this.#decodedProtectedHeader) {
-      if (!this.encodedProtectedHeader || this.encodedProtectedHeader.byteLength === 0) {
-        this.#decodedProtectedHeader = new Map();
+  public get protectedHeaders(): Map<number, unknown> {
+    if (!this.#decodedProtectedHeaders) {
+      if (!this.encodedProtectedHeaders || this.encodedProtectedHeaders.byteLength === 0) {
+        this.#decodedProtectedHeaders = new Map();
       } else {
-        this.#decodedProtectedHeader = encoder.decode(this.encodedProtectedHeader as Uint8Array);
+        this.#decodedProtectedHeaders = encoder.decode(this.encodedProtectedHeaders as Uint8Array);
       }
     }
-    return this.#decodedProtectedHeader as Map<number, unknown>;
+    return this.#decodedProtectedHeaders as Map<number, unknown>;
   }
 }

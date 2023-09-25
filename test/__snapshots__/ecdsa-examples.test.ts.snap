@@ -2,7 +2,7 @@
 
 exports[`ecdsa-examples ECDSA-01: ECDSA - P-256 - sign0 should properly decode the payload 1`] = `
 Sign1 {
-  "encodedProtectedHeader": {
+  "encodedProtectedHeaders": {
     "data": [
       162,
       1,
@@ -106,7 +106,7 @@ Sign1 {
     ],
     "type": "Buffer",
   },
-  "unprotectedHeader": Map {
+  "unprotectedHeaders": Map {
     4 => {
       "data": [
         49,
@@ -120,7 +120,7 @@ Sign1 {
 
 exports[`ecdsa-examples ECDSA-01: ECDSA - P-256 should properly decode the payload 1`] = `
 Sign {
-  "encodedProtectedHeader": {
+  "encodedProtectedHeaders": {
     "data": [
       161,
       3,
@@ -155,7 +155,7 @@ Sign {
   },
   "signatures": [
     Signature {
-      "encodedProtectedHeader": {
+      "encodedProtectedHeaders": {
         "data": [
           161,
           1,
@@ -232,7 +232,7 @@ Sign {
         ],
         "type": "Buffer",
       },
-      "unprotectedHeader": Map {
+      "unprotectedHeaders": Map {
         4 => {
           "data": [
             49,
@@ -243,13 +243,13 @@ Sign {
       },
     },
   ],
-  "unprotectedHeader": Map {},
+  "unprotectedHeaders": Map {},
 }
 `;
 
 exports[`ecdsa-examples ECDSA-02: ECDSA - P-384 should properly decode the payload 1`] = `
 Sign {
-  "encodedProtectedHeader": {
+  "encodedProtectedHeaders": {
     "data": [],
     "type": "Buffer",
   },
@@ -280,7 +280,7 @@ Sign {
   },
   "signatures": [
     Signature {
-      "encodedProtectedHeader": {
+      "encodedProtectedHeaders": {
         "data": [
           161,
           1,
@@ -390,7 +390,7 @@ Sign {
         ],
         "type": "Buffer",
       },
-      "unprotectedHeader": Map {
+      "unprotectedHeaders": Map {
         4 => {
           "data": [
             80,
@@ -403,13 +403,13 @@ Sign {
       },
     },
   ],
-  "unprotectedHeader": Map {},
+  "unprotectedHeaders": Map {},
 }
 `;
 
 exports[`ecdsa-examples ECDSA-03: ECDSA - P-512 - sign0 should properly decode the payload 1`] = `
 Sign1 {
-  "encodedProtectedHeader": {
+  "encodedProtectedHeaders": {
     "data": [
       161,
       1,
@@ -580,7 +580,7 @@ Sign1 {
     ],
     "type": "Buffer",
   },
-  "unprotectedHeader": Map {
+  "unprotectedHeaders": Map {
     4 => {
       "data": [
         98,
@@ -622,7 +622,7 @@ Sign1 {
 
 exports[`ecdsa-examples ECDSA-03: ECDSA - P-512 should properly decode the payload 1`] = `
 Sign {
-  "encodedProtectedHeader": {
+  "encodedProtectedHeaders": {
     "data": [],
     "type": "Buffer",
   },
@@ -653,7 +653,7 @@ Sign {
   },
   "signatures": [
     Signature {
-      "encodedProtectedHeader": {
+      "encodedProtectedHeaders": {
         "data": [
           161,
           1,
@@ -799,7 +799,7 @@ Sign {
         ],
         "type": "Buffer",
       },
-      "unprotectedHeader": Map {
+      "unprotectedHeaders": Map {
         4 => {
           "data": [
             98,
@@ -838,13 +838,13 @@ Sign {
       },
     },
   ],
-  "unprotectedHeader": Map {},
+  "unprotectedHeaders": Map {},
 }
 `;
 
 exports[`ecdsa-examples ECDSA-sig-02: ECDSA - P-384 - sign1 should properly decode the payload 1`] = `
 Sign1 {
-  "encodedProtectedHeader": {
+  "encodedProtectedHeaders": {
     "data": [
       161,
       1,
@@ -979,7 +979,7 @@ Sign1 {
     ],
     "type": "Buffer",
   },
-  "unprotectedHeader": Map {
+  "unprotectedHeaders": Map {
     4 => {
       "data": [
         80,

@@ -18,12 +18,12 @@ export class Sign extends WithHeaders {
 
   public getContentForEncoding() {
     return [
-      this.encodedProtectedHeader,
-      this.unprotectedHeader,
+      this.encodedProtectedHeaders,
+      this.unprotectedHeaders,
       this.payload,
       this.signatures.map((signature) => [
-        signature.protectedHeader,
-        signature.unprotectedHeader,
+        signature.protectedHeaders,
+        signature.unprotectedHeaders,
         signature.signature
       ]),
     ];
@@ -38,7 +38,7 @@ export class Sign extends WithHeaders {
   ): Promise<boolean> {
     const results = await Promise.all(this.signatures.map(async (signature, index) => {
       const keyToUse = Array.isArray(keys) ? keys[index] : keys;
-      return signature.verify(keyToUse, this.encodedProtectedHeader, this.payload);
+      return signature.verify(keyToUse, this.encodedProtectedHeaders, this.payload);
     }));
 
     return results.every(Boolean);
@@ -49,7 +49,7 @@ export class Sign extends WithHeaders {
   ): Promise<boolean> {
     const results = await Promise.all(this.signatures.map(async (signature) => {
       const key = await signature.verifyX509Chain(roots);
-      return signature.verify(key, this.encodedProtectedHeader, this.payload);
+      return signature.verify(key, this.encodedProtectedHeaders, this.payload);
     }));
 
     return results.every(Boolean);
@@ -89,10 +89,10 @@ export class Signature extends SignatureBase {
 
   constructor(
     protectedHeader: Uint8Array | Map<number, unknown>,
-    public readonly unprotectedHeader: Map<number, unknown>,
+    public readonly unprotectedHeaders: Map<number, unknown>,
     public readonly signature: Uint8Array,
   ) {
-    super(protectedHeader, unprotectedHeader, signature);
+    super(protectedHeader, unprotectedHeaders, signature);
   }
 
   private static Signature(
@@ -125,7 +125,7 @@ export class Signature extends SignatureBase {
 
     const toBeSigned = Signature.Signature(
       bodyProtectedHeaders,
-      this.encodedProtectedHeader,
+      this.encodedProtectedHeaders,
       new Uint8Array(),
       payload
     );

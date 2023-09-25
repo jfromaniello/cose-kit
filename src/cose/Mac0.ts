@@ -31,8 +31,8 @@ export class Mac0 extends WithHeaders {
 
   public getContentForEncoding() {
     return [
-      this.encodedProtectedHeader,
-      this.unprotectedHeader,
+      this.encodedProtectedHeaders,
+      this.unprotectedHeaders,
       this.payload,
       this.tag,
     ];
@@ -51,7 +51,7 @@ export class Mac0 extends WithHeaders {
     }
 
     const mac0Structure = Mac0.createMAC0(
-      this.encodedProtectedHeader || new Uint8Array(),
+      this.encodedProtectedHeaders || new Uint8Array(),
       externalAAD,
       this.payload,
     );
@@ -64,8 +64,8 @@ export class Mac0 extends WithHeaders {
   }
 
   public get alg(): number | undefined {
-    return this.protectedHeader.get(headers.alg) as number ||
-      this.unprotectedHeader.get(headers.alg) as number;
+    return this.protectedHeaders.get(headers.alg) as number ||
+      this.unprotectedHeaders.get(headers.alg) as number;
   }
 
   public get algName(): string | undefined {

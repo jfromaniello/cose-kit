@@ -26,8 +26,8 @@ export class SignatureBase extends WithHeaders {
       registry (see Section 16.4).
    */
   public get alg(): number | undefined {
-    return this.protectedHeader.get(headers.alg) as number ||
-      this.unprotectedHeader.get(headers.alg) as number;
+    return this.protectedHeaders.get(headers.alg) as number ||
+      this.unprotectedHeaders.get(headers.alg) as number;
   }
 
   public get algName(): string | undefined {
@@ -49,20 +49,20 @@ export class SignatureBase extends WithHeaders {
       unprotected headers bucket.
    */
   public get kid(): Uint8Array | undefined {
-    return this.protectedHeader.get(headers.kid) as Uint8Array ||
-      this.unprotectedHeader.get(headers.kid) as Uint8Array;
+    return this.protectedHeaders.get(headers.kid) as Uint8Array ||
+      this.unprotectedHeaders.get(headers.kid) as Uint8Array;
   }
 
   public get x5bag(): Uint8Array[] | undefined {
-    const x5bag = this.protectedHeader.get(headers.x5bag) ||
-      this.unprotectedHeader.get(headers.x5bag);
+    const x5bag = this.protectedHeaders.get(headers.x5bag) ||
+      this.unprotectedHeaders.get(headers.x5bag);
     if (!x5bag) { return }
     return Array.isArray(x5bag) ? x5bag : [x5bag];
   }
 
   public get x5chain(): Uint8Array[] | undefined {
-    const x5chain = this.protectedHeader.get(headers.x5chain) ||
-      this.unprotectedHeader.get(headers.x5chain);
+    const x5chain = this.protectedHeaders.get(headers.x5chain) ||
+      this.unprotectedHeaders.get(headers.x5chain);
     if (!x5chain) { return }
     return Array.isArray(x5chain) ? x5chain : [x5chain];
   }

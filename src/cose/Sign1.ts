@@ -19,8 +19,8 @@ export class Sign1 extends SignatureBase {
 
   public getContentForEncoding() {
     return [
-      this.encodedProtectedHeader,
-      this.unprotectedHeader,
+      this.encodedProtectedHeaders,
+      this.unprotectedHeaders,
       this.payload,
       this.signature,
     ];
@@ -56,7 +56,7 @@ export class Sign1 extends SignatureBase {
     }
 
     const toBeSigned = Sign1.Signature1(
-      this.encodedProtectedHeader || new Uint8Array(),
+      this.encodedProtectedHeaders || new Uint8Array(),
       externalAAD,
       this.payload,
     );

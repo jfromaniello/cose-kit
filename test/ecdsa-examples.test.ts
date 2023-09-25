@@ -82,10 +82,10 @@ describe('ecdsa-examples', () => {
             expect((signatureVerificationResult.decoded as Sign).signatures.length)
               .toBe(exampleSignatureVerificationResult.decoded.signatures.length);
           }
-          expect(signatureVerificationResult.decoded.protectedHeader)
-            .toMatchObject(exampleSignatureVerificationResult.decoded.protectedHeader);
-          expect(signatureVerificationResult.decoded.unprotectedHeader)
-            .toMatchObject(exampleSignatureVerificationResult.decoded.unprotectedHeader);
+          expect(signatureVerificationResult.decoded.protectedHeaders)
+            .toMatchObject(exampleSignatureVerificationResult.decoded.protectedHeaders);
+          expect(signatureVerificationResult.decoded.unprotectedHeaders)
+            .toMatchObject(exampleSignatureVerificationResult.decoded.unprotectedHeaders);
           expect(signatureVerificationResult.decoded.payload)
             .toMatchObject(exampleSignatureVerificationResult.decoded.payload);
         });

@@ -3,7 +3,7 @@
 exports[`Mac0 should properly verify the hmac 1`] = `
 {
   "decoded": Mac0 {
-    "encodedProtectedHeader": {
+    "encodedProtectedHeaders": {
       "data": [
         161,
         1,
@@ -73,7 +73,7 @@ exports[`Mac0 should properly verify the hmac 1`] = `
       ],
       "type": "Buffer",
     },
-    "unprotectedHeader": Map {},
+    "unprotectedHeaders": Map {},
   },
   "isValid": true,
 }
