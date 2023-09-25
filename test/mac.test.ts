@@ -7,7 +7,7 @@ import MacPass01 from './Examples/mac0-tests/mac-pass-01.json';
 import MacPass02 from './Examples/mac0-tests/mac-pass-02.json';
 import MacPass03 from './Examples/mac0-tests/mac-pass-03.json';
 import { coseVerifyMAC0, Mac0 } from '../src/index.js';
-import { MacProtectedHeader } from '../src/headers';
+import { MacProtectedHeader } from '../src/headers.js';
 
 describe('Mac0', () => {
   it('should properly verify the hmac', async () => {

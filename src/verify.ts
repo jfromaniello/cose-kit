@@ -26,7 +26,8 @@ type MultiSigVerifyResult = {
  */
 export const coseVerify = async (
   cose: Uint8Array,
-  key: KeyLike | Uint8Array | COSEVerifyGetKey
+  key: KeyLike | Uint8Array | COSEVerifyGetKey,
+  externalAAD: Uint8Array = new Uint8Array()
 ): Promise<VerifyResult> => {
   let decoded = encoder.decode(cose);
 
@@ -40,7 +41,7 @@ export const coseVerify = async (
     throw new Error('unknown COSE type');
   }
 
-  const isValid = await decoded.verify(key);
+  const isValid = await decoded.verify(key, externalAAD);
 
   return { isValid, decoded };
 };

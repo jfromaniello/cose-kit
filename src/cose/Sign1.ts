@@ -43,7 +43,10 @@ export class Sign1 extends SignatureBase {
     ]);
   }
 
-  public async verify(key: KeyLike | Uint8Array | COSEVerifyGetKey) {
+  public async verify(
+    key: KeyLike | Uint8Array | COSEVerifyGetKey,
+    externalAAD: Uint8Array = new Uint8Array()
+  ) {
     if (typeof key === 'function') {
       key = await key(this);
     }
@@ -54,7 +57,7 @@ export class Sign1 extends SignatureBase {
 
     const toBeSigned = Sign1.Signature1(
       this.encodedProtectedHeader || new Uint8Array(),
-      new Uint8Array(),
+      externalAAD,
       this.payload,
     );
 
