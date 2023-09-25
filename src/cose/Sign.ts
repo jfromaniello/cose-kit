@@ -48,8 +48,8 @@ export class Sign extends WithHeaders {
     roots: string[]
   ): Promise<boolean> {
     const results = await Promise.all(this.signatures.map(async (signature) => {
-      const key = await signature.verifyX509Chain(roots);
-      return signature.verify(key, this.encodedProtectedHeaders, this.payload);
+      const { publicKey } = await signature.verifyX509Chain(roots);
+      return signature.verify(publicKey, this.encodedProtectedHeaders, this.payload);
     }));
 
     return results.every(Boolean);

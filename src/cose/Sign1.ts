@@ -71,8 +71,8 @@ export class Sign1 extends SignatureBase {
   public async verifyX509(
     roots: string[]
   ) {
-    const key = await this.verifyX509Chain(roots);
-    return this.verify(key);
+    const { publicKey } = await this.verifyX509Chain(roots);
+    return this.verify(publicKey);
   }
 
   static async sign(
