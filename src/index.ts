@@ -17,3 +17,5 @@ export const coseSign = async (...args: Parameters<typeof Sign1.sign>): Promise<
 export const coseMultiSign = async (...args: Parameters<typeof Sign.sign>): Promise<Uint8Array> => {
   return Sign.sign(...args).then(s => s.encode());
 };
+
+export { importCOSEKey } from './key/index.js';

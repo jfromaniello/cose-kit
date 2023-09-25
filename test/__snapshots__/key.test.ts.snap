@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`COSE key when parsing a private key should be able to be imported as jwk 1`] = `Promise {}`;
+
+exports[`COSE key when parsing a private key should properly decode to JWK 1`] = `
+{
+  "crv": "P-256",
+  "d": "r_kHyZ-a06rmxM3yESK84r1otSg-aQcVStkRhA-iCM8",
+  "kid": "meriadoc.brandybuck@buckland.example",
+  "kty": "EC",
+  "x": "Ze2loSV3wrroKUN_4zhwGhCqo3Xhu1td4QjeQ5wIVR0",
+  "y": "HlLtdXARY_f55A3fnzQbPcm6hgr34Mp8p-nuzQCE0Zw",
+}
+`;
+
+exports[`COSE key when parsing a public key should be able to be imported as jwk 1`] = `Promise {}`;
+
+exports[`COSE key when parsing a public key should properly decode to JWK 1`] = `
+{
+  "crv": "P-256",
+  "kid": "meriadoc.brandybuck@buckland.example",
+  "kty": "EC",
+  "x": "Ze2loSV3wrroKUN_4zhwGhCqo3Xhu1td4QjeQ5wIVR0",
+  "y": "HlLtdXARY_f55A3fnzQbPcm6hgr34Mp8p-nuzQCE0Zw",
+}
+`;
