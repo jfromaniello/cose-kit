@@ -4,7 +4,7 @@ import { KeyLike } from 'jose';
 import { addExtension, encoder } from '../cbor.js';
 import { WithHeaders } from './WithHeaders.js';
 import { MacProtectedHeader, UnprotectedHeaders, headers, macAlgs, macAlgsToValue } from '../headers.js';
-import { fromUTF8 } from "../lib/buffer_utils.js";
+import { areEqual, fromUTF8 } from "../lib/buffer_utils.js";
 
 export class Mac0 extends WithHeaders {
   constructor(
@@ -74,6 +74,13 @@ export class Mac0 extends WithHeaders {
 
   public hasSupportedAlg() {
     return !!this.algName;
+  }
+
+  /**
+   * compares the tag of this instance with the tag of the given instance
+   */
+  public areEqual(mac0: Mac0) {
+    return areEqual(this.tag, mac0.tag);
   }
 
   static async create(
