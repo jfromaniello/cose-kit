@@ -27,8 +27,13 @@ function decodedCOSEKeyToJWK(decoded: Map<number, number | Uint8Array>): JWK {
   return result;
 }
 
-export function COSEKeyToJWK(coseKey: Uint8Array): JWK {
-  const decoded = encoder.decode(coseKey) as Map<number, number | Uint8Array>;
+export function COSEKeyToJWK(coseKey: Uint8Array | Map<number, number | Uint8Array>): JWK {
+  let decoded: Map<number, number | Uint8Array>;
+  if (coseKey instanceof Uint8Array) {
+    decoded = encoder.decode(coseKey) as Map<number, number | Uint8Array>;
+  } else {
+    decoded = coseKey;
+  }
   const result = decodedCOSEKeyToJWK(decoded);
   return result;
 }
