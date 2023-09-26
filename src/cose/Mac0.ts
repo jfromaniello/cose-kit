@@ -72,6 +72,10 @@ export class Mac0 extends WithHeaders {
     return this.alg ? macAlgs.get(this.alg)?.name : undefined;
   }
 
+  public hasSupportedAlg() {
+    return !!this.algName;
+  }
+
   static async create(
     protectedHeader: MacProtectedHeader,
     unprotectedHeader: UnprotectedHeaders | undefined,
