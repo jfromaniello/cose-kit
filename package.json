@@ -25,7 +25,6 @@
   "scripts": {
     "test": "jest --verbose",
     "lint": "eslint --ext .ts src",
-    "postinstall": "patch-package",
     "prepare": "run-s clean:* build:*",
     "prepack": "run-s clean:* build:*",
     "build": "tsc",
@@ -64,7 +63,6 @@
     "@peculiar/webcrypto": "^1.4.3",
     "cbor-x": "^1.5.4",
     "jose": "^4.14.6",
-    "patch-package": "^8.0.0",
     "pkijs": "^3.0.15"
   },
   "imports": {
