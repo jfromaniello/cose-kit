@@ -1,6 +1,6 @@
 import * as fs from 'fs';
-import { getJWKSetFromExample } from './util';
-import { coseVerify, coseVerifyMultiSignature, coseSign, coseMultiSign, Sign } from '../src';
+import { getJWKSetFromExample } from './util.js';
+import { coseVerify, coseVerifyMultiSignature, coseSign, coseMultiSign, Sign } from '../src/index.js';
 import { JWK, importJWK } from 'jose';
 type VerificationResult = Awaited<ReturnType<typeof coseVerify> | ReturnType<typeof coseVerifyMultiSignature>>;
 
