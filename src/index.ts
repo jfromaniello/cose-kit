@@ -20,4 +20,4 @@ export const coseMultiSign = async (...args: Parameters<typeof Sign.sign>): Prom
   return Sign.sign(...args).then(s => s.encode());
 };
 
-export { importCOSEKey } from './key/index.js';
+export { importCOSEKey, importDecodedCOSEKey } from './key/index.js';
