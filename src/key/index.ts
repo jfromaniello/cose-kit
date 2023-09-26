@@ -15,8 +15,7 @@ const parameterParsers = new Map<number, (v: unknown) => unknown>([
   [Label.d, encodeBase64URL],
 ]);
 
-export function COSEKeyToJWK(coseKey: Uint8Array): JWK {
-  const decoded = encoder.decode(coseKey) as Map<number, any>;
+function decodedCOSEKeyToJWK(decoded: Map<number, number | Uint8Array>): JWK {
   const result: JWK = {};
   for (const [key, value] of decoded) {
     const jwkKey = ValueToLabel.get(key);
@@ -28,7 +27,31 @@ export function COSEKeyToJWK(coseKey: Uint8Array): JWK {
   return result;
 }
 
+export function COSEKeyToJWK(coseKey: Uint8Array): JWK {
+  const decoded = encoder.decode(coseKey) as Map<number, number | Uint8Array>;
+  const result = decodedCOSEKeyToJWK(decoded);
+  return result;
+}
+
+// export async function exportCOSEKey(key: KeyLike): Promise<Uint8Array> {
+//   const jwk = await JWK.asKey(key);
+//   const coseKey: Map<number, number | Uint8Array> = new Map();
+//   for (const [key, value] of Object.entries(jwk)) {
+//     const label = ValueToLabel.get(key as Label);
+//     const parser = parameterParsers.get(key as Label);
+//     if (parser && label) {
+//       coseKey.set(label, parser(value));
+//     }
+//   }
+//   return encoder.encode(coseKey);
+// }
+
 export async function importCOSEKey(coseKey: Uint8Array): Promise<Uint8Array | KeyLike> {
   const jwk = COSEKeyToJWK(coseKey);
+  return importJWK(jwk);
+}
+
+export async function importDecodedCOSEKey(decoded: Map<number, number | Uint8Array>): Promise<Uint8Array | KeyLike> {
+  const jwk = decodedCOSEKeyToJWK(decoded);
   return importJWK(jwk);
 }
