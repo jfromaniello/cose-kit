@@ -6,7 +6,7 @@ Example:
 
 ```js
 const { importJWK } = require('jose');
-const { coseVerify }  = require('cose');
+const { coseVerify }  = require('cose-kit');
 
 const key = await importJWK(jwk);
 
@@ -19,7 +19,7 @@ Multi-signature:
 
 ```js
 const { importJWK } = require('jose');
-const { coseVerifyMultiSignature }  = require('cose');
+const { coseVerifyMultiSignature }  = require('cose-kit');
 
 const key = await importJWK(jwk);
 
@@ -32,7 +32,7 @@ const { isValid } = await coseVerifyMultiSignature(cose, [ key ]);
 X509 certificates:
 
 ```js
-const { coseVerifyX509 }  = require('cose');
+const { coseVerifyX509 }  = require('cose-kit');
 
 const caRoots = [
   `-----BEGIN CERTIFICATE-----...`
@@ -48,7 +48,7 @@ Signing a payload:
 
 ```js
 const { importJWK } = require('jose');
-const { coseSign }  = require('cose');
+const { coseSign }  = require('cose-kit');
 
 const key = await importJWK(jwk);
 
@@ -63,8 +63,8 @@ const cose = await coseSign(
 Using [COSE keys](https://datatracker.ietf.org/doc/html/rfc8152#section-7):
 
 ```js
-const { coseSign, importCOSEKey }  = require('cose');
-const key = await importCOSEKey(jwk);
+const { coseSign, importCOSEKey }  = require('cose-kit');
+const key = await importCOSEKey(coseKey);
 const cose = await coseSign(
   { alg: 'ES256' },
   { ctyp: 0 },
