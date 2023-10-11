@@ -58,7 +58,19 @@ const cose = await coseSign(
   Buffer.from('hello world', 'utf8'),
   key
 );
+```
 
+Using [COSE keys](https://datatracker.ietf.org/doc/html/rfc8152#section-7):
+
+```js
+const { coseSign, importCOSEKey }  = require('cose');
+const key = await importCOSEKey(jwk);
+const cose = await coseSign(
+  { alg: 'ES256' },
+  { ctyp: 0 },
+  Buffer.from('hello world', 'utf8'),
+  key
+);
 ```
 
 
