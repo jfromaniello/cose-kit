@@ -1,24 +1,54 @@
-export enum Label {
-  kty = 1,
-  kid = 2,
-  alg = 3,
-  key_opts = 4,
-  base_iv = 5,
+import { reverseMap } from "../util/maps.js";
 
-  crv = -1,
-  x = -2,
-  y = -3,
-  d = -4,
-}
-
-export const ValueToLabel = new Map([
+export const LABEL = new Map([
   [1, 'kty'],
   [2, 'kid'],
   [3, 'alg'],
-  [4, 'key_opts'],
+  [4, 'key_ops'],
   [5, 'base_iv'],
-  [-1, 'crv'],
-  [-2, 'x'],
-  [-3, 'y'],
-  [-4, 'd']
 ]);
+
+export const KEY_TYPE_LABELS: { [k: string]: Map<number, string> | undefined } = {
+  'EC': new Map([
+    [-1, 'crv'],
+    [-2, 'x'],
+    [-3, 'y'],
+    [-4, 'd'],
+  ]),
+  'OKP': new Map([
+    [-1, 'crv'],
+    [-2, 'x'],
+    [-3, 'y'],
+    [-4, 'd'],
+  ]),
+  'oct': new Map([
+    [-1, 'k'],
+  ]),
+};
+
+export const COSE_LABEL = reverseMap(LABEL);
+
+export const COSE_KEY_TYPE_LABELS = Object.fromEntries(
+  Object
+    .entries(KEY_TYPE_LABELS)
+    .map(([k, v]) => [k, reverseMap(v!)])
+);
+
+export const BufferTypes = [
+  "base_iv",
+  "d",
+  "x",
+  "y",
+  "n",
+  "e",
+  "p",
+  "q",
+  "dp",
+  "dq",
+  "qi",
+  "r_i",
+  "d_i",
+  "t_i",
+  "k",
+  "pub",
+];

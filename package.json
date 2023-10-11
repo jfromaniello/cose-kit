@@ -52,6 +52,8 @@
     "@types/node": "^20.6.3",
     "@typescript-eslint/eslint-plugin": "^6.7.2",
     "@typescript-eslint/parser": "^6.7.2",
+    "buffer-tag": "^1.0.2",
+    "cbor-diag-wasm": "^0.1.1",
     "eslint": "^8.49.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.28.1",
