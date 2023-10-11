@@ -22,5 +22,6 @@ export const coseMultiSign = async (...args: Parameters<typeof Sign.sign>): Prom
 
 export {
   importCOSEKey,
-  COSEKeyToJWK
+  COSEKeyToJWK,
+  COSEKeyFromJWK,
 } from './key/index.js';
