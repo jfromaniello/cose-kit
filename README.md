@@ -1,6 +1,6 @@
 This is an early prototype of a RFC8152 COSE library for node.js.
 
-It is inspired and uses a lot of code from [panva/jose](https://github.com/panva/jose).
+It is inspired by and uses [panva/jose](https://github.com/panva/jose).
 
 Example:
 
