@@ -73,6 +73,10 @@
   "imports": {
     "#runtime/*": "./src/runtime/node/*.ts"
   },
+  "repository": "github:jfromaniello/cose-kit",
+  "bugs": {
+    "url": "https://github.com/jfromaniello/cose-kit/issues"
+  },
   "keywords": [
     "cose",
     "jose",
