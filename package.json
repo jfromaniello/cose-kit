@@ -72,5 +72,10 @@
   },
   "imports": {
     "#runtime/*": "./src/runtime/node/*.ts"
-  }
+  },
+  "keywords": [
+    "cose",
+    "jose",
+    "RFC8152"
+  ]
 }
