@@ -25,3 +25,5 @@ export {
   COSEKeyToJWK,
   COSEKeyFromJWK,
 } from './key/index.js';
+
+export { ProtectedHeader, UnprotectedHeaders } from './headers.js';
