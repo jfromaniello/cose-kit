@@ -47,8 +47,8 @@ describe('x509-examples', () => {
               example.input.sign.signers.map(async (signer: { key: JWK; protected: unknown; unprotected: { x5chain?: string }; }) => {
                 return {
                   key: await importJWK(parseJWK(signer.key)),
-                  protectedHeader: signer.protected,
-                  unprotectedHeader: {
+                  protectedHeaders: signer.protected,
+                  unprotectedHeaders: {
                     ...signer.unprotected || {},
                     x5chain: signer.unprotected?.x5chain ? Buffer.from(signer.unprotected?.x5chain, 'hex') : undefined
                   },

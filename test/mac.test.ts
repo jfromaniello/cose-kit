@@ -7,7 +7,7 @@ import MacPass01 from './Examples/mac0-tests/mac-pass-01.json';
 import MacPass02 from './Examples/mac0-tests/mac-pass-02.json';
 import MacPass03 from './Examples/mac0-tests/mac-pass-03.json';
 import { coseVerifyMAC0, Mac0 } from '../src/index.js';
-import { MacProtectedHeader } from '../src/headers.js';
+import { MacProtectedHeaders } from '../src/headers.js';
 
 describe('Mac0', () => {
   it('should properly verify the hmac', async () => {
@@ -22,7 +22,7 @@ describe('Mac0', () => {
     const key = await importJWK(HMac01.input.mac0.recipients[0].key);
     const expected = Buffer.from(HMac01.output.cbor, 'hex');
     const actual = await Mac0.create(
-      HMac01.input.mac0.protected as MacProtectedHeader,
+      HMac01.input.mac0.protected as MacProtectedHeaders,
       {}, //HMac01.input.mac0.recipients[0].unprotected,
       Buffer.from(HMac01.input.plaintext, 'utf-8'),
       key,

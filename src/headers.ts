@@ -74,14 +74,14 @@ export const headers: { [k: string]: number } = {
   x5u: 35,
 };
 
-export type ProtectedHeader = {
+export type ProtectedHeaders = {
   alg?: 'EdDSA' | 'ES256' | 'ES384' | 'ES512' | 'PS256' | 'PS384' | 'PS512' | 'RS256' | 'RS384' | 'RS512',
   crit?: number[],
   ctyp?: number | string,
   [key: string]: unknown,
 };
 
-export type MacProtectedHeader = {
+export type MacProtectedHeaders = {
   alg?: 'HS256',
   crit?: number[],
   ctyp?: number | string,
@@ -94,12 +94,12 @@ export type UnprotectedHeaders = {
   x5chain?: Uint8Array | Uint8Array[],
 };
 
-export const encodeProtectedHeaders = (protectedHeader: ProtectedHeader | undefined) => {
-  if (typeof protectedHeader === 'undefined') {
+export const encodeProtectedHeaders = (protectedHeaders: ProtectedHeaders | undefined) => {
+  if (typeof protectedHeaders === 'undefined') {
     return new Uint8Array();
   }
 
-  return encoder.encode(new Map(Object.entries(protectedHeader || {}).map(([k, v]: [string, unknown]) => {
+  return encoder.encode(new Map(Object.entries(protectedHeaders || {}).map(([k, v]: [string, unknown]) => {
     if (k === 'alg') {
       v = algsToValue.get(v as string);
     } else if (typeof v === 'string') {
@@ -109,8 +109,8 @@ export const encodeProtectedHeaders = (protectedHeader: ProtectedHeader | undefi
   })))
 };
 
-export const mapUnprotectedHeaders = (unprotectedHeader: UnprotectedHeaders | undefined) => {
-  return new Map(Object.entries(unprotectedHeader || {}).map(([k, v]: [string, unknown]) => {
+export const mapUnprotectedHeaders = (unprotectedHeaders: UnprotectedHeaders | undefined) => {
+  return new Map(Object.entries(unprotectedHeaders || {}).map(([k, v]: [string, unknown]) => {
     if (typeof v === 'string') {
       v = fromUTF8(v);
     }

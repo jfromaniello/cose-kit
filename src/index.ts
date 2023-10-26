@@ -26,4 +26,4 @@ export {
   COSEKeyFromJWK,
 } from './key/index.js';
 
-export { ProtectedHeader, UnprotectedHeaders } from './headers.js';
+export { ProtectedHeaders, UnprotectedHeaders } from './headers.js';

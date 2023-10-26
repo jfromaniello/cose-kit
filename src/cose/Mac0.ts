@@ -3,27 +3,27 @@ import sign from '#runtime/sign.js';
 import { KeyLike } from 'jose';
 import { addExtension, encoder } from '../cbor.js';
 import { WithHeaders } from './WithHeaders.js';
-import { MacProtectedHeader, UnprotectedHeaders, headers, macAlgs, macAlgsToValue } from '../headers.js';
+import { MacProtectedHeaders, UnprotectedHeaders, headers, macAlgs, macAlgsToValue } from '../headers.js';
 import { areEqual, fromUTF8 } from "../lib/buffer_utils.js";
 
 export class Mac0 extends WithHeaders {
   constructor(
-    protectedHeader: Map<number, unknown> | Uint8Array,
-    unprotectedHeader: Map<number, unknown>,
+    protectedHeaders: Map<number, unknown> | Uint8Array,
+    unprotectedHeaders: Map<number, unknown>,
     public readonly payload: Uint8Array,
     public tag: Uint8Array,
   ) {
-    super(protectedHeader, unprotectedHeader);
+    super(protectedHeaders, unprotectedHeaders);
   }
 
   private static createMAC0(
-    protectedHeader: Uint8Array,
+    protectedHeaders: Uint8Array,
     applicationHeaders: Uint8Array,
     payload: Uint8Array,
   ) {
     return encoder.encode([
       'MAC0',
-      protectedHeader,
+      protectedHeaders,
       applicationHeaders,
       payload,
     ]);
@@ -84,14 +84,14 @@ export class Mac0 extends WithHeaders {
   }
 
   static async create(
-    protectedHeader: MacProtectedHeader,
-    unprotectedHeader: UnprotectedHeaders | undefined,
+    protectedHeaders: MacProtectedHeaders,
+    unprotectedHeaders: UnprotectedHeaders | undefined,
     payload: Uint8Array,
     key: KeyLike | Uint8Array,
   ) {
-    const { alg } = protectedHeader;
+    const { alg } = protectedHeaders;
 
-    const encodedProtectedHeaders = encoder.encode(new Map(Object.entries(protectedHeader).map(([k, v]: [string, unknown]) => {
+    const encodedProtectedHeaders = encoder.encode(new Map(Object.entries(protectedHeaders).map(([k, v]: [string, unknown]) => {
       if (k === 'alg') {
         v = macAlgsToValue.get(v as string);
       } else if (typeof v === 'string') {
@@ -100,7 +100,7 @@ export class Mac0 extends WithHeaders {
       return [headers[k], v];
     })));
 
-    const unprotectedHeadersMap = new Map(Object.entries(unprotectedHeader || {}).map(([k, v]: [string, unknown]) => {
+    const unprotectedHeadersMap = new Map(Object.entries(unprotectedHeaders || {}).map(([k, v]: [string, unknown]) => {
       if (typeof v === 'string') {
         v = fromUTF8(v);
       }

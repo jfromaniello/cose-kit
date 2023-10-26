@@ -57,8 +57,8 @@ describe('ecdsa-examples', () => {
               example.input.sign.signers.map(async (signer: { key: JWK; protected: unknown; unprotected: unknown; }) => {
                 return {
                   key: await importJWK(signer.key),
-                  protectedHeader: signer.protected,
-                  unprotectedHeader: signer.unprotected,
+                  protectedHeaders: signer.protected,
+                  unprotectedHeaders: signer.unprotected,
                 };
               }
               )

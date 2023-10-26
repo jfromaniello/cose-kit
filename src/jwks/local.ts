@@ -224,11 +224,11 @@ export type COSEVerifyGetKey = ReturnType<typeof createLocalJWKSet>;
  *   ],
  * })
  *
- * const { payload, protectedHeader } = await jose.jwtVerify(jwt, JWKS, {
+ * const { payload, protectedHeaders } = await jose.jwtVerify(jwt, JWKS, {
  *   issuer: 'urn:example:issuer',
  *   audience: 'urn:example:audience',
  * })
- * console.log(protectedHeader)
+ * console.log(protectedHeaders)
  * console.log(payload)
  * ```
  *
@@ -239,7 +239,7 @@ export type COSEVerifyGetKey = ReturnType<typeof createLocalJWKSet>;
  *   issuer: 'urn:example:issuer',
  *   audience: 'urn:example:audience',
  * }
- * const { payload, protectedHeader } = await jose
+ * const { payload, protectedHeaders } = await jose
  *   .jwtVerify(jwt, JWKS, options)
  *   .catch(async (error) => {
  *     if (error?.code === 'ERR_JWKS_MULTIPLE_MATCHING_KEYS') {
@@ -258,7 +258,7 @@ export type COSEVerifyGetKey = ReturnType<typeof createLocalJWKSet>;
  *
  *     throw error
  *   })
- * console.log(protectedHeader)
+ * console.log(protectedHeaders)
  * console.log(payload)
  * ```
  *

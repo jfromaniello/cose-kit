@@ -1,7 +1,7 @@
 import verify from "#runtime/verify.js";
 import { KeyLike } from 'jose';
 import { COSEVerifyGetKey } from '../jwks/local.js';
-import { ProtectedHeader, UnprotectedHeaders, algsToValue, headers } from '../headers.js';
+import { ProtectedHeaders, UnprotectedHeaders, algsToValue, headers } from '../headers.js';
 import sign from '#runtime/sign.js';
 import { fromUTF8 } from '../lib/buffer_utils.js';
 import { SignatureBase } from './SignatureBase.js';
@@ -9,12 +9,12 @@ import { encoder, addExtension } from '../cbor.js';
 
 export class Sign1 extends SignatureBase {
   constructor(
-    protectedHeader: Map<number, unknown> | Uint8Array,
-    unprotectedHeader: Map<number, unknown>,
+    protectedHeaders: Map<number, unknown> | Uint8Array,
+    unprotectedHeaders: Map<number, unknown>,
     public readonly payload: Uint8Array,
     signature: Uint8Array,
   ) {
-    super(protectedHeader, unprotectedHeader, signature);
+    super(protectedHeaders, unprotectedHeaders, signature);
   }
 
   public getContentForEncoding() {
@@ -31,13 +31,13 @@ export class Sign1 extends SignatureBase {
   }
 
   private static Signature1(
-    protectedHeader: Uint8Array,
+    protectedHeaders: Uint8Array,
     applicationHeaders: Uint8Array,
     payload: Uint8Array,
   ) {
     return encoder.encode([
       'Signature1',
-      protectedHeader,
+      protectedHeaders,
       applicationHeaders,
       payload,
     ]);
@@ -76,14 +76,14 @@ export class Sign1 extends SignatureBase {
   }
 
   static async sign(
-    protectedHeader: ProtectedHeader,
-    unprotectedHeader: UnprotectedHeaders | undefined,
+    protectedHeaders: ProtectedHeaders,
+    unprotectedHeaders: UnprotectedHeaders | undefined,
     payload: Uint8Array,
     key: KeyLike | Uint8Array,
   ) {
-    const { alg } = protectedHeader;
+    const { alg } = protectedHeaders;
 
-    const encodedProtectedHeaders = encoder.encode(new Map(Object.entries(protectedHeader).map(([k, v]: [string, unknown]) => {
+    const encodedProtectedHeaders = encoder.encode(new Map(Object.entries(protectedHeaders).map(([k, v]: [string, unknown]) => {
       if (k === 'alg') {
         v = algsToValue.get(v as string);
       } else if (typeof v === 'string') {
@@ -92,7 +92,7 @@ export class Sign1 extends SignatureBase {
       return [headers[k], v];
     })));
 
-    const unprotectedHeadersMap = new Map(Object.entries(unprotectedHeader || {}).map(([k, v]: [string, unknown]) => {
+    const unprotectedHeadersMap = new Map(Object.entries(unprotectedHeaders || {}).map(([k, v]: [string, unknown]) => {
       if (typeof v === 'string') {
         v = fromUTF8(v);
       }

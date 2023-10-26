@@ -3,17 +3,17 @@ import { WithHeaders } from './WithHeaders.js';
 import { KeyLike } from 'jose';
 import verify from "#runtime/verify.js";
 import { COSEVerifyGetKey } from '../jwks/local.js';
-import { UnprotectedHeaders, ProtectedHeader, mapUnprotectedHeaders, encodeProtectedHeaders } from '../headers.js';
+import { UnprotectedHeaders, ProtectedHeaders, mapUnprotectedHeaders, encodeProtectedHeaders } from '../headers.js';
 import sign from '#runtime/sign.js';
 import { encoder, addExtension } from '../cbor.js';
 
 export class Sign extends WithHeaders {
   constructor(
-    protectedHeader: Uint8Array | Map<number, unknown>,
-    unprotectedHeader: Map<number, unknown>,
+    protectedHeaders: Uint8Array | Map<number, unknown>,
+    unprotectedHeaders: Map<number, unknown>,
     public readonly payload: Uint8Array,
     public readonly signatures: Signature[]) {
-    super(protectedHeader, unprotectedHeader);
+    super(protectedHeaders, unprotectedHeaders);
   }
 
   public getContentForEncoding() {
@@ -56,22 +56,22 @@ export class Sign extends WithHeaders {
   }
 
   static async sign(
-    bodyProtectedHeader: ProtectedHeader,
-    unprotectedHeader: UnprotectedHeaders | undefined,
+    bodyProtectedHeader: ProtectedHeaders,
+    unprotectedHeaders: UnprotectedHeaders | undefined,
     payload: Uint8Array,
     signers: {
       key: KeyLike | Uint8Array,
-      protectedHeader: ProtectedHeader,
-      unprotectedHeader?: UnprotectedHeaders,
+      protectedHeaders: ProtectedHeaders,
+      unprotectedHeaders?: UnprotectedHeaders,
     }[],
   ): Promise<Sign> {
     const encodedProtectedHeaders = encodeProtectedHeaders(bodyProtectedHeader);
-    const unprotectedHeadersMap = mapUnprotectedHeaders(unprotectedHeader);
-    const signatures = await Promise.all(signers.map(async ({ key, protectedHeader, unprotectedHeader }) => {
+    const unprotectedHeadersMap = mapUnprotectedHeaders(unprotectedHeaders);
+    const signatures = await Promise.all(signers.map(async ({ key, protectedHeaders, unprotectedHeaders }) => {
       return Signature.sign(
         encodedProtectedHeaders,
-        protectedHeader,
-        unprotectedHeader,
+        protectedHeaders,
+        unprotectedHeaders,
         payload,
         key,
       );
@@ -88,11 +88,11 @@ export class Sign extends WithHeaders {
 export class Signature extends SignatureBase {
 
   constructor(
-    protectedHeader: Uint8Array | Map<number, unknown>,
+    protectedHeaders: Uint8Array | Map<number, unknown>,
     public readonly unprotectedHeaders: Map<number, unknown>,
     public readonly signature: Uint8Array,
   ) {
-    super(protectedHeader, unprotectedHeaders, signature);
+    super(protectedHeaders, unprotectedHeaders, signature);
   }
 
   private static Signature(
@@ -139,14 +139,14 @@ export class Signature extends SignatureBase {
 
   static async sign(
     bodyProtectedHeaders: Uint8Array | undefined,
-    protectedHeader: ProtectedHeader,
-    unprotectedHeader: UnprotectedHeaders | undefined,
+    protectedHeaders: ProtectedHeaders,
+    unprotectedHeaders: UnprotectedHeaders | undefined,
     payload: Uint8Array,
     key: KeyLike | Uint8Array,
   ) {
-    const { alg } = protectedHeader;
-    const encodedProtectedHeaders = encodeProtectedHeaders(protectedHeader);
-    const unprotectedHeadersMapped = mapUnprotectedHeaders(unprotectedHeader);
+    const { alg } = protectedHeaders;
+    const encodedProtectedHeaders = encodeProtectedHeaders(protectedHeaders);
+    const unprotectedHeadersMapped = mapUnprotectedHeaders(unprotectedHeaders);
 
     const toBeSigned = Signature.Signature(
       bodyProtectedHeaders,

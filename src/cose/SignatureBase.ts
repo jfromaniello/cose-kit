@@ -8,11 +8,11 @@ import { WithHeaders } from './WithHeaders.js';
 
 export class SignatureBase extends WithHeaders {
   constructor(
-    protectedHeader: Uint8Array | Map<number, unknown>,
-    unprotectedHeader: Map<number, unknown>,
+    protectedHeaders: Uint8Array | Map<number, unknown>,
+    unprotectedHeaders: Map<number, unknown>,
     public readonly signature: Uint8Array,
   ) {
-    super(protectedHeader, unprotectedHeader);
+    super(protectedHeaders, unprotectedHeaders);
   }
 
   /**
