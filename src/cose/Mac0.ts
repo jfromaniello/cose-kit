@@ -3,7 +3,7 @@ import sign from '#runtime/sign.js';
 import { KeyLike } from 'jose';
 import { addExtension, encoder } from '../cbor.js';
 import { WithHeaders } from './WithHeaders.js';
-import { MacProtectedHeaders, UnprotectedHeaders, headers, macAlgs, macAlgsToValue } from '../headers.js';
+import { MacProtectedHeaders, UnprotectedHeaders, headers, macAlgs, macAlgsToValue, SupportedMacAlg } from '../headers.js';
 import { areEqual, fromUTF8 } from "../lib/buffer_utils.js";
 
 export class Mac0 extends WithHeaders {
@@ -68,7 +68,7 @@ export class Mac0 extends WithHeaders {
       this.unprotectedHeaders.get(headers.alg) as number;
   }
 
-  public get algName(): string | undefined {
+  public get algName(): SupportedMacAlg | undefined {
     return this.alg ? macAlgs.get(this.alg)?.name : undefined;
   }
 
@@ -93,7 +93,7 @@ export class Mac0 extends WithHeaders {
 
     const encodedProtectedHeaders = encoder.encode(new Map(Object.entries(protectedHeaders).map(([k, v]: [string, unknown]) => {
       if (k === 'alg') {
-        v = macAlgsToValue.get(v as string);
+        v = macAlgsToValue.get(v as SupportedMacAlg);
       } else if (typeof v === 'string') {
         v = fromUTF8(v);
       }

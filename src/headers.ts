@@ -31,7 +31,7 @@ export const algs = new Map<number, { name: string, hash?: string }>(
    | 512/512   |       |         |          |                          |
    +-----------+-------+---------+----------+--------------------------+
  */
-export const macAlgs = new Map<number, { name: string, hash: string, length?: number }>([
+export const macAlgs = new Map<number, { name: SupportedMacAlg, hash: string, length?: number }>([
   [5, { name: 'HS256', hash: 'SHA-256', length: 256 }],
   [6, { name: 'HS384', hash: 'SHA-384', length: 384 }],
   [7, { name: 'HS512', hash: 'SHA-512', length: 512 }]
@@ -79,8 +79,10 @@ export type ProtectedHeaders = {
   [key: string]: unknown,
 };
 
+export type SupportedMacAlg = 'HS256' | 'HS384' | 'HS512';
+
 export type MacProtectedHeaders = {
-  alg?: 'HS256' | 'HS384' | 'HS512',
+  alg?: SupportedMacAlg,
   crit?: number[],
   ctyp?: number | string,
   [key: string]: unknown,
