@@ -42,10 +42,19 @@ export class Mac0 extends WithHeaders {
     return encoder.encode(this);
   }
 
+  /**
+   * Verifies the signature of this instance using the given key.
+   *
+   * @param {KeyLike | Uint8Array} key - The key to verify the signature with.
+   * @param {Uint8Array} externalAAD - External Additional Associated Data
+   * @param {Uint8Array} detachedPayload - The detached payload to verify the signature with.
+   * @returns {Boolean} - The result of the signature verification.
+   */
   public async verify(
     key: KeyLike | Uint8Array,
-    externalAAD: Uint8Array = new Uint8Array()
-  ) {
+    externalAAD: Uint8Array = new Uint8Array(),
+    detachedPayload?: Uint8Array
+  ): Promise<boolean> {
     if (!key) {
       throw new Error('key not found');
     }
@@ -53,7 +62,7 @@ export class Mac0 extends WithHeaders {
     const mac0Structure = Mac0.createMAC0(
       this.encodedProtectedHeaders || new Uint8Array(),
       externalAAD,
-      this.payload,
+      detachedPayload ?? this.payload,
     );
 
     if (!this.algName) {
