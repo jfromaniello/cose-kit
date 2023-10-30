@@ -32,14 +32,12 @@ export const algs = new Map<number, { name: string, hash?: string }>(
    +-----------+-------+---------+----------+--------------------------+
  */
 export const macAlgs = new Map<number, { name: string, hash: string, length?: number }>([
-  [5, { name: 'HS256', hash: 'SHA-256', length: 256 }]
+  [5, { name: 'HS256', hash: 'SHA-256', length: 256 }],
+  [6, { name: 'HS384', hash: 'SHA-384', length: 384 }],
+  [7, { name: 'HS512', hash: 'SHA-512', length: 512 }]
 ]);
 
-export const macAlgsToValue = new Map<string, number>(
-  [
-    ['HS256', 5],
-  ]
-);
+export const macAlgsToValue = new Map(Array.from(macAlgs.entries()).map(([k, v]) => [v.name, k]));
 
 export const algsToValue = new Map<string, number>(
   [
@@ -82,7 +80,7 @@ export type ProtectedHeaders = {
 };
 
 export type MacProtectedHeaders = {
-  alg?: 'HS256',
+  alg?: 'HS256' | 'HS384' | 'HS512',
   crit?: number[],
   ctyp?: number | string,
   [key: string]: unknown,
