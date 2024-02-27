@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { getJWKSetFromExample } from './util.js';
+import { getJWKSetFromExample, mapExampleProtectedHeaders } from './util.js';
 import { coseVerify, coseVerifyMultiSignature, coseSign, coseMultiSign, Sign } from '../src/index.js';
 import { JWK, importJWK } from 'jose';
 type VerificationResult = Awaited<ReturnType<typeof coseVerify> | ReturnType<typeof coseVerifyMultiSignature>>;
@@ -47,8 +47,8 @@ describe('ecdsa-examples', () => {
           let signed: Uint8Array;
           if (example.input.sign0) {
             signed = await coseSign(
-              example.input.sign0.protected,
-              example.input.sign0.unprotected,
+              mapExampleProtectedHeaders(example.input.sign0.protected),
+              mapExampleProtectedHeaders(example.input.sign0.unprotected),
               Buffer.from(example.input.plaintext, 'utf8'),
               await importJWK(example.input.sign0.key)
             );
@@ -57,15 +57,15 @@ describe('ecdsa-examples', () => {
               example.input.sign.signers.map(async (signer: { key: JWK; protected: unknown; unprotected: unknown; }) => {
                 return {
                   key: await importJWK(signer.key),
-                  protectedHeaders: signer.protected,
-                  unprotectedHeaders: signer.unprotected,
+                  protectedHeaders: mapExampleProtectedHeaders(signer.protected),
+                  unprotectedHeaders: mapExampleProtectedHeaders(signer.unprotected),
                 };
               }
               )
             );
             signed = await coseMultiSign(
-              example.input.sign.protected,
-              example.input.sign.unprotected,
+              mapExampleProtectedHeaders(example.input.sign.protected),
+              mapExampleProtectedHeaders(example.input.sign.unprotected),
               Buffer.from(example.input.plaintext, 'utf8'),
               signers
             );

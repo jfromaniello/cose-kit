@@ -1,9 +1,8 @@
 import verify from "#runtime/verify.js";
 import { KeyLike } from 'jose';
 import { COSEVerifyGetKey } from '../jwks/local.js';
-import { ProtectedHeaders, UnprotectedHeaders, algsToValue, headers } from '../headers.js';
+import { AlgorithmNames, Headers, ProtectedHeaders, UnprotectedHeaders } from '../headers.js';
 import sign from '#runtime/sign.js';
-import { fromUTF8 } from '../lib/buffer_utils.js';
 import { SignatureBase } from './SignatureBase.js';
 import { encoder, addExtension } from '../cbor.js';
 
@@ -76,28 +75,19 @@ export class Sign1 extends SignatureBase {
   }
 
   static async sign(
-    protectedHeaders: ProtectedHeaders,
-    unprotectedHeaders: UnprotectedHeaders | undefined,
+    protectedHeaders: ProtectedHeaders | ConstructorParameters<typeof ProtectedHeaders>[0],
+    unprotectedHeaders: UnprotectedHeaders | ConstructorParameters<typeof UnprotectedHeaders>[0] | undefined,
     payload: Uint8Array,
     key: KeyLike | Uint8Array,
   ) {
-    const { alg } = protectedHeaders;
 
-    const encodedProtectedHeaders = encoder.encode(new Map(Object.entries(protectedHeaders).map(([k, v]: [string, unknown]) => {
-      if (k === 'alg') {
-        v = algsToValue.get(v as string);
-      } else if (typeof v === 'string') {
-        v = fromUTF8(v);
-      }
-      return [headers[k], v];
-    })));
+    const wProtectedHeaders = ProtectedHeaders.wrap(protectedHeaders);
 
-    const unprotectedHeadersMap = new Map(Object.entries(unprotectedHeaders || {}).map(([k, v]: [string, unknown]) => {
-      if (typeof v === 'string') {
-        v = fromUTF8(v);
-      }
-      return [headers[k], v];
-    }));
+    const alg = AlgorithmNames.get(wProtectedHeaders.get(Headers.Algorithm));
+
+    const encodedProtectedHeaders = encoder.encode(wProtectedHeaders.esMap);
+
+    const unprotectedHeadersMap = UnprotectedHeaders.wrap(unprotectedHeaders).esMap;
 
     const toBeSigned = Sign1.Signature1(
       encodedProtectedHeaders,

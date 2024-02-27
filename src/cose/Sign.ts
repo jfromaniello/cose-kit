@@ -3,7 +3,7 @@ import { WithHeaders } from './WithHeaders.js';
 import { KeyLike } from 'jose';
 import verify from "#runtime/verify.js";
 import { COSEVerifyGetKey } from '../jwks/local.js';
-import { UnprotectedHeaders, ProtectedHeaders, mapUnprotectedHeaders, encodeProtectedHeaders } from '../headers.js';
+import { UnprotectedHeaders, ProtectedHeaders, AlgorithmNames, Headers } from '../headers.js';
 import sign from '#runtime/sign.js';
 import { encoder, addExtension } from '../cbor.js';
 
@@ -56,8 +56,8 @@ export class Sign extends WithHeaders {
   }
 
   static async sign(
-    bodyProtectedHeader: ProtectedHeaders,
-    unprotectedHeaders: UnprotectedHeaders | undefined,
+    bodyProtectedHeader: ProtectedHeaders | ConstructorParameters<typeof ProtectedHeaders>[0],
+    unprotectedHeaders: UnprotectedHeaders | ConstructorParameters<typeof UnprotectedHeaders>[0] | undefined,
     payload: Uint8Array,
     signers: {
       key: KeyLike | Uint8Array,
@@ -65,8 +65,8 @@ export class Sign extends WithHeaders {
       unprotectedHeaders?: UnprotectedHeaders,
     }[],
   ): Promise<Sign> {
-    const encodedProtectedHeaders = encodeProtectedHeaders(bodyProtectedHeader);
-    const unprotectedHeadersMap = mapUnprotectedHeaders(unprotectedHeaders);
+    const encodedProtectedHeaders = ProtectedHeaders.from(bodyProtectedHeader).encode();
+    const unprotectedHeadersMap = UnprotectedHeaders.from(unprotectedHeaders).esMap;
     const signatures = await Promise.all(signers.map(async ({ key, protectedHeaders, unprotectedHeaders }) => {
       return Signature.sign(
         encodedProtectedHeaders,
@@ -139,14 +139,16 @@ export class Signature extends SignatureBase {
 
   static async sign(
     bodyProtectedHeaders: Uint8Array | undefined,
-    protectedHeaders: ProtectedHeaders,
+    protectedHeaders: ProtectedHeaders | ConstructorParameters<typeof ProtectedHeaders>[0],
     unprotectedHeaders: UnprotectedHeaders | undefined,
     payload: Uint8Array,
     key: KeyLike | Uint8Array,
   ) {
-    const { alg } = protectedHeaders;
-    const encodedProtectedHeaders = encodeProtectedHeaders(protectedHeaders);
-    const unprotectedHeadersMapped = mapUnprotectedHeaders(unprotectedHeaders);
+    const wProtectedHeaders = ProtectedHeaders.from(protectedHeaders);
+    const alg = AlgorithmNames.get(wProtectedHeaders.get(Headers.Algorithm));
+
+    const encodedProtectedHeaders = wProtectedHeaders.encode();
+    const unprotectedHeadersMapped = UnprotectedHeaders.from(unprotectedHeaders).esMap;
 
     const toBeSigned = Signature.Signature(
       bodyProtectedHeaders,

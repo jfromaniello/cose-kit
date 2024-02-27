@@ -65,6 +65,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@jfromaniello/typedmap": "^1.2.0",
     "@peculiar/webcrypto": "^1.4.3",
     "cbor-x": "^1.5.4",
     "jose": "^4.14.6",

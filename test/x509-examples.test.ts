@@ -4,8 +4,8 @@ import crypto from 'crypto';
 import { coseVerifyX509 } from '../src/verify.js';
 import { Sign, coseMultiSign, coseSign } from '../src/index.js';
 import { JWK, importJWK } from 'jose';
-import { parseJWK } from './util.js';
-import { headers } from '../src/headers.js';
+import { mapExampleProtectedHeaders, parseJWK } from './util.js';
+import { Algorithms, Headers, ProtectedHeaders, UnprotectedHeaders } from '../src/headers.js';
 
 const caRoots = [
   fs.readFileSync(`${__dirname}/Examples/x509-examples/ca.crt`, 'utf8')
@@ -37,8 +37,8 @@ describe('x509-examples', () => {
           let signed: Uint8Array;
           if (example.input.sign0) {
             signed = await coseSign(
-              example.input.sign0.protected,
-              example.input.sign0.unprotected,
+              mapExampleProtectedHeaders(example.input.sign0.protected),
+              mapExampleProtectedHeaders(example.input.sign0.unprotected),
               Buffer.from(example.input.plaintext, 'utf8'),
               await importJWK(parseJWK(example.input.sign0.key))
             );
@@ -47,18 +47,19 @@ describe('x509-examples', () => {
               example.input.sign.signers.map(async (signer: { key: JWK; protected: unknown; unprotected: { x5chain?: string }; }) => {
                 return {
                   key: await importJWK(parseJWK(signer.key)),
-                  protectedHeaders: signer.protected,
-                  unprotectedHeaders: {
+                  // @ts-ignore
+                  protectedHeaders: mapExampleProtectedHeaders(signer.protected),
+                  unprotectedHeaders: mapExampleProtectedHeaders({
                     ...signer.unprotected || {},
                     x5chain: signer.unprotected?.x5chain ? Buffer.from(signer.unprotected?.x5chain, 'hex') : undefined
-                  },
+                  }),
                 };
               }
               )
             );
             signed = await coseMultiSign(
-              example.input.sign.protected,
-              example.input.sign.unprotected,
+              mapExampleProtectedHeaders(example.input.sign.protected),
+              mapExampleProtectedHeaders(example.input.sign.unprotected),
               Buffer.from(example.input.plaintext, 'utf8'),
               signers
             );
@@ -74,7 +75,7 @@ describe('x509-examples', () => {
           const current = ((signatureVerificationResult.decoded as Sign)
             .signatures[0]
             .unprotectedHeaders
-            .get(headers.x5chain) as Buffer).toString('hex').toUpperCase();
+            .get(Headers.X5Chain) as Buffer).toString('hex').toUpperCase();
           const expected = example.input.sign0?.unprotected?.x5chain || example.input.sign?.signers[0].unprotected.x5chain;
           expect(current).toBe(expected);
         });
@@ -90,8 +91,10 @@ describe('x509-examples', () => {
     const payload = Buffer.from('Hello World!');
     it('should fail to verify', async () => {
       const signed = await coseSign(
-        { alg: 'ES256' },
-        { x5chain },
+        new ProtectedHeaders([[Headers.Algorithm, Algorithms.ES256]]),
+        new UnprotectedHeaders([[
+          Headers.X5Chain, x5chain
+        ]]),
         payload,
         key
       );

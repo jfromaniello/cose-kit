@@ -3,7 +3,7 @@ import { pkijs } from '#runtime/pkijs.js';
 import { decodeBase64 } from '#runtime/base64.js';
 import { X509InvalidCertificateChain, X509NoMatchingCertificate } from '../util/errors.js';
 import { certToPEM, pemToCert } from '../util/cert.js';
-import { headers, algs } from '../headers.js';
+import { AlgorithmNames, Algorithms, Headers } from '../headers.js';
 import { WithHeaders } from './WithHeaders.js';
 
 export class SignatureBase extends WithHeaders {
@@ -25,13 +25,13 @@ export class SignatureBase extends WithHeaders {
       supplied data.  The value is taken from the "COSE Algorithms"
       registry (see Section 16.4).
    */
-  public get alg(): number | undefined {
-    return this.protectedHeaders.get(headers.alg) as number ||
-      this.unprotectedHeaders.get(headers.alg) as number;
+  public get alg(): Algorithms | undefined {
+    return this.protectedHeaders.get(Headers.Algorithm) as Algorithms ||
+      this.unprotectedHeaders.get(Headers.Algorithm) as Algorithms;
   }
 
   public get algName(): string | undefined {
-    return this.alg ? algs.get(this.alg)?.name : undefined;
+    return this.alg ? AlgorithmNames.get(this.alg) : undefined;
   }
 
   /**
@@ -49,20 +49,20 @@ export class SignatureBase extends WithHeaders {
       unprotected headers bucket.
    */
   public get kid(): Uint8Array | undefined {
-    return this.protectedHeaders.get(headers.kid) as Uint8Array ||
-      this.unprotectedHeaders.get(headers.kid) as Uint8Array;
+    return this.protectedHeaders.get(Headers.KeyID) as Uint8Array ||
+      this.unprotectedHeaders.get(Headers.KeyID) as Uint8Array;
   }
 
   public get x5bag(): Uint8Array[] | undefined {
-    const x5bag = this.protectedHeaders.get(headers.x5bag) ||
-      this.unprotectedHeaders.get(headers.x5bag);
+    const x5bag = this.protectedHeaders.get(Headers.X5Bag) ||
+      this.unprotectedHeaders.get(Headers.X5Bag);
     if (!x5bag) { return }
     return Array.isArray(x5bag) ? x5bag : [x5bag];
   }
 
   public get x5chain(): Uint8Array[] | undefined {
-    const x5chain = this.protectedHeaders.get(headers.x5chain) ||
-      this.unprotectedHeaders.get(headers.x5chain);
+    const x5chain = this.protectedHeaders.get(Headers.X5Chain) ||
+      this.unprotectedHeaders.get(Headers.X5Chain);
     if (!x5chain) { return }
     return Array.isArray(x5chain) ? x5chain : [x5chain];
   }

@@ -3,8 +3,8 @@ import sign from '#runtime/sign.js';
 import { KeyLike } from 'jose';
 import { addExtension, encoder } from '../cbor.js';
 import { WithHeaders } from './WithHeaders.js';
-import { MacProtectedHeaders, UnprotectedHeaders, headers, macAlgs, macAlgsToValue, SupportedMacAlg } from '../headers.js';
-import { areEqual, fromUTF8 } from "../lib/buffer_utils.js";
+import { Headers, MacProtectedHeaders, UnprotectedHeaders, SupportedMacAlg, MacAlgorithmNames, MacAlgorithms } from '../headers.js';
+import { areEqual } from "../lib/buffer_utils.js";
 
 export class Mac0 extends WithHeaders {
   constructor(
@@ -72,13 +72,13 @@ export class Mac0 extends WithHeaders {
     return verify(this.algName, key, this.tag, mac0Structure);
   }
 
-  public get alg(): number | undefined {
-    return this.protectedHeaders.get(headers.alg) as number ||
-      this.unprotectedHeaders.get(headers.alg) as number;
+  public get alg(): MacAlgorithms | undefined {
+    return this.protectedHeaders.get(Headers.Algorithm) as MacAlgorithms ||
+      this.unprotectedHeaders.get(Headers.Algorithm) as MacAlgorithms;
   }
 
   public get algName(): SupportedMacAlg | undefined {
-    return this.alg ? macAlgs.get(this.alg)?.name : undefined;
+    return this.alg ? MacAlgorithmNames.get(this.alg) : undefined;
   }
 
   public hasSupportedAlg() {
@@ -93,28 +93,19 @@ export class Mac0 extends WithHeaders {
   }
 
   static async create(
-    protectedHeaders: MacProtectedHeaders,
-    unprotectedHeaders: UnprotectedHeaders | undefined,
+    protectedHeaders: MacProtectedHeaders | ConstructorParameters<typeof MacProtectedHeaders>[0],
+    unprotectedHeaders: UnprotectedHeaders | ConstructorParameters<typeof UnprotectedHeaders>[0] | undefined,
     payload: Uint8Array,
     key: KeyLike | Uint8Array,
   ) {
-    const { alg } = protectedHeaders;
 
-    const encodedProtectedHeaders = encoder.encode(new Map(Object.entries(protectedHeaders).map(([k, v]: [string, unknown]) => {
-      if (k === 'alg') {
-        v = macAlgsToValue.get(v as SupportedMacAlg);
-      } else if (typeof v === 'string') {
-        v = fromUTF8(v);
-      }
-      return [headers[k], v];
-    })));
+    const wProtectedHeaders = MacProtectedHeaders.wrap(protectedHeaders);
 
-    const unprotectedHeadersMap = new Map(Object.entries(unprotectedHeaders || {}).map(([k, v]: [string, unknown]) => {
-      if (typeof v === 'string') {
-        v = fromUTF8(v);
-      }
-      return [headers[k], v];
-    }));
+    const alg = MacAlgorithmNames.get(wProtectedHeaders.get(Headers.Algorithm));
+
+    const encodedProtectedHeaders = encoder.encode(wProtectedHeaders.esMap);
+
+    const wUnprotectedHeaders = UnprotectedHeaders.wrap(unprotectedHeaders);
 
     const toBeSigned = Mac0.createMAC0(
       encodedProtectedHeaders,
@@ -130,7 +121,7 @@ export class Mac0 extends WithHeaders {
 
     return new Mac0(
       encodedProtectedHeaders,
-      unprotectedHeadersMap,
+      wUnprotectedHeaders.esMap,
       payload,
       tag
     );

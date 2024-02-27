@@ -1,119 +1,147 @@
-import { fromUTF8 } from "./lib/buffer_utils.js";
+import { TypedMap } from "@jfromaniello/typedmap";
 import { encoder } from "./cbor.js";
 
-export const algs = new Map<number, { name: string, hash?: string }>(
-  [
-    [-8, { name: 'EdDSA' }],
-    [-7, { name: 'ES256', hash: 'SHA-256' }],
-    [-35, { name: 'ES384', hash: 'SHA-384' }],
-    [-36, { name: 'ES512', hash: 'SHA-512' }],
-    [-37, { name: 'PS256', hash: 'SHA-256' }],
-    [-38, { name: 'PS384', hash: 'SHA-384' }],
-    [-39, { name: 'PS512', hash: 'SHA-512' }],
-    [-257, { name: 'RS256', hash: 'SHA-256' }],
-    [-258, { name: 'RS384', hash: 'SHA-384' }],
-    [-259, { name: 'RS512', hash: 'SHA-512' }],
-  ]
-);
-
 /**
-   +-----------+-------+---------+----------+--------------------------+
-   | Name      | Value | Hash    | Tag      | Description              |
-   |           |       |         | Length   |                          |
-   +-----------+-------+---------+----------+--------------------------+
-   | HMAC      | 4     | SHA-256 | 64       | HMAC w/ SHA-256          |
-   | 256/64    |       |         |          | truncated to 64 bits     |
-   | HMAC      | 5     | SHA-256 | 256      | HMAC w/ SHA-256          |
-   | 256/256   |       |         |          |                          |
-   | HMAC      | 6     | SHA-384 | 384      | HMAC w/ SHA-384          |
-   | 384/384   |       |         |          |                          |
-   | HMAC      | 7     | SHA-512 | 512      | HMAC w/ SHA-512          |
-   | 512/512   |       |         |          |                          |
-   +-----------+-------+---------+----------+--------------------------+
+ * COSE Header labels registered in the IANA "COSE Header Parameters" registry.
+ * Reference: https://www.iana.org/assignments/cose/cose.xhtml#header-parameters
  */
-export const macAlgs = new Map<number, { name: SupportedMacAlg, hash: string, length?: number }>([
-  [5, { name: 'HS256', hash: 'SHA-256', length: 256 }],
-  [6, { name: 'HS384', hash: 'SHA-384', length: 384 }],
-  [7, { name: 'HS512', hash: 'SHA-512', length: 512 }]
+export enum Headers {
+  Algorithm = 1,
+  Critical = 2,
+  ContentType = 3,
+  KeyID = 4,
+  IV = 5,
+  PartialIV = 6,
+  CounterSignature = 7,
+  CounterSignature0 = 9,
+  CounterSignatureV2 = 11,
+  CounterSignature0V2 = 12,
+  X5Bag = 32,
+  X5Chain = 33,
+  X5T = 34,
+  X5U = 35,
+}
+
+export enum Algorithms {
+  EdDSA = -8,
+  ES256 = -7,
+  ES384 = -35,
+  ES512 = -36,
+  PS256 = -37,
+  PS384 = -38,
+  PS512 = -39,
+  RS256 = -257,
+  RS384 = -258,
+  RS512 = -259,
+}
+
+export enum MacAlgorithms {
+  HS256 = 5,
+  HS384 = 6,
+  HS512 = 7,
+}
+
+export const MacAlgorithmNames = new Map<MacAlgorithms, SupportedMacAlg>([
+  [MacAlgorithms.HS256, 'HS256'],
+  [MacAlgorithms.HS384, 'HS384'],
+  [MacAlgorithms.HS512, 'HS512']
 ]);
 
-export const macAlgsToValue = new Map(Array.from(macAlgs.entries()).map(([k, v]) => [v.name, k]));
+export const AlgorithmNames = new Map<Algorithms, SupportedAlgs>([
+  [Algorithms.EdDSA, 'EdDSA'],
+  [Algorithms.ES256, 'ES256'],
+  [Algorithms.ES384, 'ES384'],
+  [Algorithms.ES512, 'ES512'],
+  [Algorithms.PS256, 'PS256'],
+  [Algorithms.PS384, 'PS384'],
+  [Algorithms.PS512, 'PS512'],
+  [Algorithms.RS256, 'RS256'],
+  [Algorithms.RS384, 'RS384'],
+  [Algorithms.RS512, 'RS512']
+]);
 
-export const algsToValue = new Map<string, number>(
+export type SupportedAlgs = 'EdDSA' | 'ES256' | 'ES384' | 'ES512' | 'PS256' | 'PS384' | 'PS512' | 'RS256' | 'RS384' | 'RS512';
+
+export class ProtectedHeaders extends TypedMap<
+  [Headers.Algorithm, Algorithms] |
+  [Headers.Critical, Headers[]] |
+  [Headers.ContentType, number | Uint8Array] |
+  [Headers.KeyID, Uint8Array] |
   [
-    ['EdDSA', -8],
-    ['ES256', -7],
-    ['ES384', -35],
-    ['ES512', -36],
-    ['PS256', -37],
-    ['PS384', -38],
-    ['PS512', -39],
-    ['RS256', -257],
-    ['RS384', -258],
-    ['RS512', -259],
+    Omit<Headers, Headers.Algorithm | Headers.Critical | Headers.ContentType | Headers.KeyID>,
+    Uint8Array | Uint8Array[] | number | number[]
   ]
-);
+> {
+  /**
+   * Ensure input is a ProtectedHeaders instance.
+   *
+   * @param headers - The headers to wrap.
+   * @returns
+   */
+  static from(headers: ProtectedHeaders | ConstructorParameters<typeof ProtectedHeaders>[0]) {
+    //similar to base class wrap
+    if (headers instanceof ProtectedHeaders) {
+      return headers;
+    }
+    return new ProtectedHeaders(headers);
+  }
 
-export const headers: { [k: string]: number } = {
-  partyUNonce: -22,
-  static_key_id: -3,
-  static_key: -2,
-  ephemeral_key: -1,
-  alg: 1,
-  crit: 2,
-  ctyp: 3,
-  kid: 4,
-  IV: 5,
-  Partial_IV: 6,
-  counter_signature: 7,
-  x5bag: 32,
-  x5chain: 33,
-  x5t: 34,
-  x5u: 35,
-};
-
-export type ProtectedHeaders = {
-  alg?: 'EdDSA' | 'ES256' | 'ES384' | 'ES512' | 'PS256' | 'PS384' | 'PS512' | 'RS256' | 'RS384' | 'RS512',
-  crit?: number[],
-  ctyp?: number | string,
-  [key: string]: unknown,
-};
+  /**
+   * CBOR encode the hedaers instance
+   * @returns {Uint8Array} - The encoded protected headers.
+   */
+  encode(): Uint8Array {
+    return encoder.encode(this.esMap);
+  }
+}
 
 export type SupportedMacAlg = 'HS256' | 'HS384' | 'HS512';
 
-export type MacProtectedHeaders = {
-  alg?: SupportedMacAlg,
-  crit?: number[],
-  ctyp?: number | string,
-  [key: string]: unknown,
-};
-
-export type UnprotectedHeaders = {
-  ctyp?: number | string,
-  kid?: Uint8Array | string,
-  x5chain?: Uint8Array | Uint8Array[],
-};
-
-export const encodeProtectedHeaders = (protectedHeaders: ProtectedHeaders | undefined) => {
-  if (typeof protectedHeaders === 'undefined') {
-    return new Uint8Array();
+export class MacProtectedHeaders extends TypedMap<
+  [Headers.Algorithm, MacAlgorithms] |
+  [Headers.Critical, Headers[]] |
+  [Headers.ContentType, number | Uint8Array] |
+  [Headers.KeyID, Uint8Array] |
+  [
+    Omit<Headers, Headers.Algorithm | Headers.Critical | Headers.ContentType | Headers.KeyID>,
+    Uint8Array | number | number[]
+  ]
+> {
+  /**
+   * Ensure input is a MacProtectedHeaders instance.
+   *
+   * @param headers - The headers to wrap.
+   * @returns
+   */
+  static from(headers: MacProtectedHeaders | ConstructorParameters<typeof MacProtectedHeaders>[0]) {
+    //similar to base class wrap
+    if (headers instanceof MacProtectedHeaders) {
+      return headers;
+    }
+    return new MacProtectedHeaders(headers);
   }
+}
 
-  return encoder.encode(new Map(Object.entries(protectedHeaders || {}).map(([k, v]: [string, unknown]) => {
-    if (k === 'alg') {
-      v = algsToValue.get(v as string);
-    } else if (typeof v === 'string') {
-      v = fromUTF8(v);
+export class UnprotectedHeaders extends TypedMap<
+  [Headers.ContentType, number | Uint8Array] |
+  [Headers.KeyID, Uint8Array] |
+  [Headers.X5Chain, Uint8Array | Uint8Array[]] |
+  [
+    number,
+    number | number[] | Uint8Array | Uint8Array[]
+  ]
+> {
+  /**
+ * Ensure input is a MacProtectedHeaders instance.
+ *
+ * @param headers - The headers to wrap.
+ * @returns
+ */
+  static from(headers: UnprotectedHeaders | ConstructorParameters<typeof UnprotectedHeaders>[0]) {
+    //similar to base class wrap
+    if (headers instanceof UnprotectedHeaders) {
+      return headers;
     }
-    return [headers[k], v];
-  })))
-};
-
-export const mapUnprotectedHeaders = (unprotectedHeaders: UnprotectedHeaders | undefined) => {
-  return new Map(Object.entries(unprotectedHeaders || {}).map(([k, v]: [string, unknown]) => {
-    if (typeof v === 'string') {
-      v = fromUTF8(v);
-    }
-    return [headers[k], v];
-  }));
-};
+    return new UnprotectedHeaders(headers);
+  }
+}

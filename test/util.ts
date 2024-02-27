@@ -1,5 +1,8 @@
 import { JWK } from "jose";
-import { createLocalJWKSet } from "../src/jwks/local";
+import { createLocalJWKSet } from "../src/jwks/local.js";
+import { Header } from "../src/index.js";
+import { fromUTF8 } from "../src/lib/buffer_utils.js";
+import { Algorithms } from "../src/headers.js";
 
 export const parseJWK = (jwk: object): JWK => {
   const result: JWK = {
@@ -81,4 +84,35 @@ export interface Intermediates {
 export interface Output {
   cbor_diag: string;
   cbor: string;
+}
+
+
+const exampleHeaderNameMap: { [key: string]: Header } = {
+  'ctyp': Header.ContentType,
+  'kid': Header.KeyID,
+  'alg': Header.Algorithm,
+  'crit': Header.Critical,
+  'x5chain': Header.X5Chain,
+}
+
+export const mapExampleProtectedHeaders = (headers: { [key: string]: unknown } | unknown): [Header, Uint8Array][] => {
+  if (!headers || typeof headers !== 'object') {
+    return [];
+  }
+  return Object.entries(headers).map(([key, value]) => {
+    const header = exampleHeaderNameMap[key];
+    if (header === undefined) {
+      throw new Error(`Unknown header ${key}`);
+    }
+    let v = value;
+    if (typeof value === 'string') {
+      if (key === 'alg') {
+        const algKey = value as keyof typeof Algorithms;
+        v = Algorithms[algKey];
+      } else {
+        v = fromUTF8(value);
+      }
+    }
+    return [header, v];
+  }) as [Header, Uint8Array][];
 }
