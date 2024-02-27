@@ -48,7 +48,13 @@ Signing a payload:
 
 ```js
 import { importJWK } from "jose";
-import { Algorithms, ProtectedHeaders, Headers, coseSign, UnprotectedHeaders } from "cose-kit";
+import {
+  Algorithms,
+  ProtectedHeaders,
+  UnprotectedHeaders,
+  Headers,
+  coseSign,
+} from "cose-kit";
 
 (async () => {
   const key = await importJWK({
