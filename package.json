@@ -81,6 +81,7 @@
   "keywords": [
     "cose",
     "jose",
-    "RFC8152"
+    "RFC9052",
+    "RFC9053"
   ]
 }
