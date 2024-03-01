@@ -1,17 +1,37 @@
-import { reverseMap } from '../util/maps.js';
+export enum KeyOps {
+  Sign = 1,
+  Verify = 2,
+  Encrypt = 3,
+  Decrypt = 4,
+  WrapKey = 5,
+  UnwrapKey = 6,
+  DeriveKey = 7,
+  DeriveBits = 8,
+  MACCreate = 9,
+  MACVerify = 10,
+}
 
-export const KEY_OPS = new Map([
-  [1, 'sign'],
-  [2, 'verify'],
-  [3, 'encrypt'],
-  [4, 'decrypt'],
-  [5, 'wrapKey'],
-  [6, 'unwrapKey'],
-  [7, 'deriveKey'],
-  [8, 'deriveBits'],
+export const JWKKeyOps = new Map<KeyOps, string>([
+  [KeyOps.Sign, 'sign'],
+  [KeyOps.Verify, 'verify'],
+  [KeyOps.Encrypt, 'encrypt'],
+  [KeyOps.Decrypt, 'decrypt'],
+  [KeyOps.WrapKey, 'wrapKey'],
+  [KeyOps.UnwrapKey, 'unwrapKey'],
+  [KeyOps.DeriveKey, 'deriveKey'],
+  [KeyOps.DeriveBits, 'deriveBits'],
   //in JWK MAC Create and MAC Verify are sign and verify.
-  [9, 'sign'],
-  [10, 'verify']
+  [KeyOps.MACCreate, 'sign'],
+  [KeyOps.MACVerify, 'verify']
 ]);
 
-export const COSE_KEY_OPS = reverseMap(KEY_OPS);
+export const JWKKeyOpsToCOSE = new Map<string, KeyOps[]>([
+  ['sign', [KeyOps.Sign, KeyOps.MACCreate]],
+  ['verify', [KeyOps.Verify, KeyOps.MACVerify]],
+  ['encrypt', [KeyOps.Encrypt]],
+  ['decrypt', [KeyOps.Decrypt]],
+  ['wrapKey', [KeyOps.WrapKey]],
+  ['unwrapKey', [KeyOps.UnwrapKey]],
+  ['deriveKey', [KeyOps.DeriveKey]],
+  ['deriveBits', [KeyOps.DeriveBits]],
+]);

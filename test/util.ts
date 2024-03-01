@@ -1,8 +1,7 @@
 import { JWK } from "jose";
 import { createLocalJWKSet } from "../src/jwks/local.js";
-import { Header } from "../src/index.js";
 import { fromUTF8 } from "../src/lib/buffer_utils.js";
-import { Algorithms } from "../src/headers.js";
+import { Algorithms, Headers } from "../src/headers.js";
 
 export const parseJWK = (jwk: object): JWK => {
   const result: JWK = {
@@ -87,15 +86,15 @@ export interface Output {
 }
 
 
-const exampleHeaderNameMap: { [key: string]: Header } = {
-  'ctyp': Header.ContentType,
-  'kid': Header.KeyID,
-  'alg': Header.Algorithm,
-  'crit': Header.Critical,
-  'x5chain': Header.X5Chain,
+const exampleHeaderNameMap: { [key: string]: Headers } = {
+  'ctyp': Headers.ContentType,
+  'kid': Headers.KeyID,
+  'alg': Headers.Algorithm,
+  'crit': Headers.Critical,
+  'x5chain': Headers.X5Chain,
 }
 
-export const mapExampleProtectedHeaders = (headers: { [key: string]: unknown } | unknown): [Header, Uint8Array][] => {
+export const mapExampleProtectedHeaders = (headers: { [key: string]: unknown } | unknown): [Headers, Uint8Array][] => {
   if (!headers || typeof headers !== 'object') {
     return [];
   }
@@ -114,5 +113,5 @@ export const mapExampleProtectedHeaders = (headers: { [key: string]: unknown } |
       }
     }
     return [header, v];
-  }) as [Header, Uint8Array][];
+  }) as [Headers, Uint8Array][];
 }

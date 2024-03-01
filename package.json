@@ -65,14 +65,15 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@jfromaniello/typedmap": "^1.2.0",
+    "@jfromaniello/typedmap": "^1.4.0",
     "@peculiar/webcrypto": "^1.4.3",
     "cbor-x": "^1.5.4",
     "jose": "^4.14.6",
     "pkijs": "^3.0.15"
   },
   "imports": {
-    "#runtime/*": "./src/runtime/node/*.ts"
+    "#runtime/*": "./src/runtime/node/*.ts",
+    "#dist": "./dist/node/esm/index.js"
   },
   "repository": "github:jfromaniello/cose-kit",
   "bugs": {

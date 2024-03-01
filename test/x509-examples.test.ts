@@ -1,8 +1,7 @@
 import * as fs from 'fs';
 import crypto from 'crypto';
 
-import { coseVerifyX509 } from '../src/verify.js';
-import { Sign, coseMultiSign, coseSign } from '../src/index.js';
+import { Sign, Sign1 } from '../src/index.js';
 import { JWK, importJWK } from 'jose';
 import { mapExampleProtectedHeaders, parseJWK } from './util.js';
 import { Algorithms, Headers, ProtectedHeaders, UnprotectedHeaders } from '../src/headers.js';
@@ -23,25 +22,27 @@ describe('x509-examples', () => {
     describe(example.title, () => {
 
       it('should verify the signature', async () => {
-        const result = await coseVerifyX509(
-          Buffer.from(example.output.cbor, 'hex'),
+        const decoded = example.input.sign0 ?
+          Sign1.decode(Buffer.from(example.output.cbor, 'hex')) :
+          Sign.decode(Buffer.from(example.output.cbor, 'hex'));
+        await decoded.verifyX509(
           caRoots
         );
-        expect(result.isValid).toBeTruthy();
       });
 
       describe('when signing a certificate with x5chain', () => {
-        let signatureVerificationResult: Awaited<ReturnType<typeof coseVerifyX509>>;
+        let decoded: Sign1 | Sign;
 
         beforeAll(async () => {
           let signed: Uint8Array;
           if (example.input.sign0) {
-            signed = await coseSign(
+            signed = await Sign1.sign(
               mapExampleProtectedHeaders(example.input.sign0.protected),
               mapExampleProtectedHeaders(example.input.sign0.unprotected),
               Buffer.from(example.input.plaintext, 'utf8'),
               await importJWK(parseJWK(example.input.sign0.key))
-            );
+            ).then(s => s.encode());
+            decoded = Sign1.decode(signed);
           } else {
             const signers = await Promise.all(
               example.input.sign.signers.map(async (signer: { key: JWK; protected: unknown; unprotected: { x5chain?: string }; }) => {
@@ -57,26 +58,24 @@ describe('x509-examples', () => {
               }
               )
             );
-            signed = await coseMultiSign(
+            signed = await Sign.sign(
               mapExampleProtectedHeaders(example.input.sign.protected),
               mapExampleProtectedHeaders(example.input.sign.unprotected),
               Buffer.from(example.input.plaintext, 'utf8'),
               signers
-            );
+            ).then(s => s.encode());
+            decoded = Sign.decode(signed);
           }
-          signatureVerificationResult = await coseVerifyX509(signed, caRoots);
-        });
-
-        it('should verify the signature', async () => {
-          expect(signatureVerificationResult.isValid).toBeTruthy();
+          decoded.verifyX509(caRoots);
         });
 
         it('should contain the x5chain', () => {
-          const current = ((signatureVerificationResult.decoded as Sign)
+          const current = ((decoded as Sign)
             .signatures[0]
             .unprotectedHeaders
             .get(Headers.X5Chain) as Buffer).toString('hex').toUpperCase();
-          const expected = example.input.sign0?.unprotected?.x5chain || example.input.sign?.signers[0].unprotected.x5chain;
+          const expected = example.input.sign0?.unprotected?.x5chain ||
+            example.input.sign?.signers[0].unprotected.x5chain;
           expect(current).toBe(expected);
         });
 
@@ -90,7 +89,7 @@ describe('x509-examples', () => {
     const x5chain = fs.readFileSync(`${__dirname}/Examples/x509-examples/expired.der`);
     const payload = Buffer.from('Hello World!');
     it('should fail to verify', async () => {
-      const signed = await coseSign(
+      const signed = await Sign1.sign(
         new ProtectedHeaders([[Headers.Algorithm, Algorithms.ES256]]),
         new UnprotectedHeaders([[
           Headers.X5Chain, x5chain
@@ -98,7 +97,8 @@ describe('x509-examples', () => {
         payload,
         key
       );
-      await expect(coseVerifyX509(signed, caRoots))
+
+      await expect(signed.verifyX509(caRoots))
         .rejects
         .toThrowErrorMatchingSnapshot();
     });

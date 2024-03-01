@@ -3,7 +3,6 @@ import merge from 'lodash.merge';
 import path from 'path';
 
 
-
 const tsconfigs = [];
 
 let tsConfigPath = process.argv[2];

@@ -1,11 +1,14 @@
-import verify from "#runtime/verify.js";
 import { KeyLike } from 'jose';
 import { COSEVerifyGetKey } from '../jwks/local.js';
-import { AlgorithmNames, Headers, ProtectedHeaders, UnprotectedHeaders } from '../headers.js';
+import { AlgorithmNames, Algorithms, Headers, ProtectedHeaders, UnprotectedHeaders } from '../headers.js';
 import sign from '#runtime/sign.js';
-import { SignatureBase } from './SignatureBase.js';
+import { SignatureBase, VerifyOptions } from './SignatureBase.js';
 import { encoder, addExtension } from '../cbor.js';
+import { decode } from "./decode.js";
 
+/**
+ * Decoded COSE_Sign1 structure.
+ */
 export class Sign1 extends SignatureBase {
   constructor(
     protectedHeaders: Map<number, unknown> | Uint8Array,
@@ -25,10 +28,6 @@ export class Sign1 extends SignatureBase {
     ];
   }
 
-  public encode() {
-    return encoder.encode(this);
-  }
-
   private static Signature1(
     protectedHeaders: Uint8Array,
     applicationHeaders: Uint8Array,
@@ -42,29 +41,27 @@ export class Sign1 extends SignatureBase {
     ]);
   }
 
+  /**
+   *
+   * Verifies the signature of this instance using the given key.
+   *
+   * @param key {KeyLike | Uint8Array | COSEVerifyGetKey} - The key to verify the signature with.
+   * @param options {VerifyOptions} - Verify options
+   * @param options.algorithms {Algorithms[]} - List of allowed algorithms
+   * @param options.externalAAD {Uint8Array} - External Additional Associated Data
+   * @param options.detachedPayload {Uint8Array} - The detached payload to verify the signature with.
+   * @returns {Promise<void>}
+   */
   public async verify(
     key: KeyLike | Uint8Array | COSEVerifyGetKey,
-    externalAAD: Uint8Array = new Uint8Array()
-  ) {
-    if (typeof key === 'function') {
-      key = await key(this);
-    }
-
-    if (!key) {
-      throw new Error('key not found');
-    }
-
+    options?: VerifyOptions,
+  ): Promise<void> {
     const toBeSigned = Sign1.Signature1(
       this.encodedProtectedHeaders || new Uint8Array(),
-      externalAAD,
-      this.payload,
+      options?.externalAAD ?? new Uint8Array(),
+      options?.detachedPayload ?? this.payload,
     );
-
-    if (!this.algName) {
-      throw new Error('unknown algorithm: ' + this.alg);
-    }
-
-    return verify(this.algName, key, this.signature, toBeSigned);
+    await this.internalVerify(toBeSigned, key, options);
   }
 
   public async verifyX509(
@@ -83,7 +80,11 @@ export class Sign1 extends SignatureBase {
 
     const wProtectedHeaders = ProtectedHeaders.wrap(protectedHeaders);
 
-    const alg = AlgorithmNames.get(wProtectedHeaders.get(Headers.Algorithm));
+    if (!wProtectedHeaders.has(Headers.Algorithm)) {
+      throw new Error('The alg header must be set.');
+    }
+
+    const alg = AlgorithmNames.get(wProtectedHeaders.get(Headers.Algorithm) as Algorithms);
 
     const encodedProtectedHeaders = encoder.encode(wProtectedHeaders.esMap);
 
@@ -108,11 +109,24 @@ export class Sign1 extends SignatureBase {
       signature
     );
   }
+
+  /**
+  *
+  * Decode a COSE_Sign1 structure from a buffer.
+  *
+  * @param cose {Uint8Array} - The buffer containing the Cose Sign1 tagged or untagged message.
+  * @returns {Sign1} - The decoded COSE_Sign1 structure.
+  */
+  static decode(cose: Uint8Array): Sign1 {
+    return decode(cose, Sign1);
+  }
+
+  static tag = 18;
 }
 
 addExtension({
   Class: Sign1,
-  tag: 18,
+  tag: Sign1.tag,
   encode(instance: Sign1, encodeFn: (obj: unknown) => Uint8Array) {
     return encodeFn(instance.getContentForEncoding());
   },

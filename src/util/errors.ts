@@ -189,3 +189,112 @@ export class X509InvalidCertificateChain extends COSEError {
 
   code = 'ERR_X509_INVALID_CERTIFICATE_CHAIN'
 }
+
+
+/**
+ * An error subclass thrown when a COSE ciphertext decryption fails.
+ *
+ * @example
+ *
+ * Checking thrown error is this one using a stable error code
+ *
+ * ```js
+ * if (err.code === 'ERR_COSE_DECRYPTION_FAILED') {
+ *   // ...
+ * }
+ * ```
+ *
+ * @example
+ *
+ * Checking thrown error is this one using `instanceof`
+ *
+ * ```js
+ * if (err instanceof jose.errors.COSEDecryptionFailed) {
+ *   // ...
+ * }
+ * ```
+ */
+export class COSEDecryptionFailed extends COSEError {
+  /** @ignore */
+  static get code(): 'ERR_COSE_DECRYPTION_FAILED' {
+    return 'ERR_COSE_DECRYPTION_FAILED'
+  }
+
+  code = 'ERR_COSE_DECRYPTION_FAILED'
+
+  message = 'decryption operation failed'
+}
+
+
+/**
+ * An error subclass thrown when an encrypted COSE is invalid.
+ *
+ * @example
+ *
+ * Checking thrown error is this one using a stable error code
+ *
+ * ```js
+ * if (err.code === 'ERR_COSE_ENCRYPTED_INVALID') {
+ *   // ...
+ * }
+ * ```
+ *
+ * @example
+ *
+ * Checking thrown error is this one using `instanceof`
+ *
+ * ```js
+ * if (err instanceof jose.errors.COSEEncryptedInvalid) {
+ *   // ...
+ * }
+ * ```
+ */
+export class COSEEncryptedInvalid extends COSEError {
+  /** @ignore */
+  static get code(): 'ERR_COSE_ENCRYPTED_INVALID' {
+    return 'ERR_COSE_ENCRYPTED_INVALID'
+  }
+
+  code = 'ERR_COSE_ENCRYPTED_INVALID'
+}
+
+/**
+ * An error subclass thrown when the COSE message is invalid.
+ */
+export class COSEInvalid extends COSEError {
+  /** @ignore */
+  static get code(): 'ERR_COSE_INVALID' {
+    return 'ERR_COSE_INVALID'
+  }
+
+  code = 'ERR_COSE_INVALID'
+}
+
+/**
+ * An error subclass thrown when COSE signature verification fails.
+ *
+ * @example Checking thrown error is this one using a stable error code
+ *
+ * ```js
+ * if (err.code === 'ERR_COSE_SIGNATURE_VERIFICATION_FAILED') {
+ *   // ...
+ * }
+ * ```
+ *
+ * @example Checking thrown error is this one using `instanceof`
+ *
+ * ```js
+ * if (err instanceof jose.errors.COSESignatureVerificationFailed) {
+ *   // ...
+ * }
+ * ```
+ */
+export class COSESignatureVerificationFailed extends COSEError {
+  static get code(): 'ERR_COSE_SIGNATURE_VERIFICATION_FAILED' {
+    return 'ERR_COSE_SIGNATURE_VERIFICATION_FAILED'
+  }
+
+  code = 'ERR_COSE_SIGNATURE_VERIFICATION_FAILED'
+
+  message = 'signature verification failed'
+}

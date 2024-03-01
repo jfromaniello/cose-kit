@@ -1,8 +1,7 @@
 import * as fs from 'fs';
 import { getJWKSetFromExample, mapExampleProtectedHeaders } from './util.js';
-import { coseVerify, coseVerifyMultiSignature, coseSign, coseMultiSign, Sign } from '../src/index.js';
+import { Sign, Sign1 } from '../src/index.js';
 import { JWK, importJWK } from 'jose';
-type VerificationResult = Awaited<ReturnType<typeof coseVerify> | ReturnType<typeof coseVerifyMultiSignature>>;
 
 const examples = [
   `${__dirname}/Examples/ecdsa-examples/ecdsa-sig-01.json`,
@@ -22,36 +21,42 @@ describe('ecdsa-examples', () => {
   examples.forEach(example => {
     describe(example.title, () => {
       const getPublicKey = getJWKSetFromExample(example);
-      const verifyFunc = example.input.sign0 ? coseVerify : coseVerifyMultiSignature;
-      let exampleSignatureVerificationResult: VerificationResult;
+      const SignatureClass = example.input.sign0 ? Sign1 : Sign;
+      let verified = false;
+      // let exampleSignatureVerificationResult: VerificationResult;
+      let decoded: Sign1 | Sign;
 
       beforeAll(async () => {
-        exampleSignatureVerificationResult = await verifyFunc(
-          Buffer.from(example.output.cbor, 'hex'),
-          getPublicKey
-        );
+        try {
+          decoded = SignatureClass.decode(Buffer.from(example.output.cbor, 'hex'));
+          await decoded.verify(getPublicKey);
+          verified = true;
+        } catch (e) {
+          verified = false;
+        }
       });
 
       it('should verify the example signature', async () => {
-        expect(exampleSignatureVerificationResult.isValid).toBeTruthy();
+        expect(verified).toBeTruthy();
       });
 
       it('should properly decode the payload', () => {
-        expect(exampleSignatureVerificationResult.decoded).toMatchSnapshot();
+        expect(decoded).toMatchSnapshot();
       })
 
       describe('when signing the example', () => {
-        let signatureVerificationResult: VerificationResult;
+        let signatureVerified = false;
+        let decoded2: Sign1 | Sign;
 
         beforeAll(async () => {
           let signed: Uint8Array;
           if (example.input.sign0) {
-            signed = await coseSign(
+            signed = await Sign1.sign(
               mapExampleProtectedHeaders(example.input.sign0.protected),
               mapExampleProtectedHeaders(example.input.sign0.unprotected),
               Buffer.from(example.input.plaintext, 'utf8'),
               await importJWK(example.input.sign0.key)
-            );
+            ).then(s => s.encode());
           } else {
             const signers = await Promise.all(
               example.input.sign.signers.map(async (signer: { key: JWK; protected: unknown; unprotected: unknown; }) => {
@@ -63,31 +68,33 @@ describe('ecdsa-examples', () => {
               }
               )
             );
-            signed = await coseMultiSign(
+            signed = await Sign.sign(
               mapExampleProtectedHeaders(example.input.sign.protected),
               mapExampleProtectedHeaders(example.input.sign.unprotected),
               Buffer.from(example.input.plaintext, 'utf8'),
               signers
-            );
+            ).then(s => s.encode());
           }
-          signatureVerificationResult = await verifyFunc(signed, getPublicKey);
+          decoded2 = SignatureClass.decode(signed);
+          await decoded2.verify(getPublicKey);
+          signatureVerified = true;
         });
 
         it('should generate a valid signature', async () => {
-          expect(signatureVerificationResult.isValid).toBeTruthy();
+          expect(signatureVerified).toBeTruthy();
         });
 
         it('should encode as the example', () => {
-          if (exampleSignatureVerificationResult.decoded instanceof Sign) {
-            expect((signatureVerificationResult.decoded as Sign).signatures.length)
-              .toBe(exampleSignatureVerificationResult.decoded.signatures.length);
+          if (decoded instanceof Sign) {
+            expect((decoded2 as Sign).signatures.length)
+              .toBe(decoded.signatures.length);
           }
-          expect(signatureVerificationResult.decoded.protectedHeaders)
-            .toMatchObject(exampleSignatureVerificationResult.decoded.protectedHeaders);
-          expect(signatureVerificationResult.decoded.unprotectedHeaders)
-            .toMatchObject(exampleSignatureVerificationResult.decoded.unprotectedHeaders);
-          expect(signatureVerificationResult.decoded.payload)
-            .toMatchObject(exampleSignatureVerificationResult.decoded.payload);
+          expect(decoded2.protectedHeaders)
+            .toMatchObject(decoded.protectedHeaders);
+          expect(decoded2.unprotectedHeaders)
+            .toMatchObject(decoded.unprotectedHeaders);
+          expect(decoded2.payload)
+            .toMatchObject(decoded.payload);
         });
       });
     });

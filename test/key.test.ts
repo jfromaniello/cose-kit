@@ -1,6 +1,5 @@
 import fs from "fs";
-import { COSEKeyFromJWK, COSEKeyToJWK, importCOSEKey } from "../src/key/index.js";
-import { encoder } from "../src/cbor.js";
+import { COSEKey } from "../src/key/index.js";
 
 describe('COSE key', () => {
   const examplesDir = `${__dirname}/Examples/key-examples`;
@@ -16,15 +15,16 @@ describe('COSE key', () => {
         describe(testCase.title, () => {
           const coseKey = Buffer.from(testCase.output.cbor, 'hex');
           it('should properly decode to JWK', () => {
-            const jwk = COSEKeyToJWK(coseKey);
+            const jwk = COSEKey.import(coseKey).toJWK();
             expect(jwk).toEqual(testCase.jwk);
           });
           it('should be able to import the key', async () => {
-            await importCOSEKey(coseKey);
+            await COSEKey.import(coseKey).toKeyLike();
           });
           it('should properly encode the jwk to cose', () => {
-            expect(encoder.decode(COSEKeyFromJWK(testCase.jwk)))
-              .toEqual(encoder.decode(coseKey));
+            const actual = COSEKey.fromJWK(testCase.jwk);
+            const expected = COSEKey.import(coseKey);
+            expect(actual).toEqual(expected);
           });
         });
       });

@@ -1,10 +1,10 @@
 import example from './Examples/sign-tests/sign-pass-03.json';
-import { createLocalJWKSet } from '../src/jwks/local';
-import { Signature } from '../src/cose/Sign';
-import { encoder } from '../src/cbor';
-import { getJWKSetFromExample, getPublicJWK } from './util';
-import { coseVerify } from '../src/verify';
+import { createLocalJWKSet } from '../src/jwks/local.js';
+import { Signature } from '../src/cose/Sign.js';
+import { encoder } from '../src/cbor.js';
+import { getJWKSetFromExample, getPublicJWK } from './util.js';
 import ecdsaSig01 from './Examples/ecdsa-examples/ecdsa-sig-01.json';
+import { Sign1 } from '../src/index.js';
 
 describe('jwks_local', () => {
   const getKey = createLocalJWKSet({
@@ -21,10 +21,9 @@ describe('jwks_local', () => {
 
   it('should verify the signature when using the createLocalJWKSet', async () => {
     const getKey = getJWKSetFromExample(ecdsaSig01);
-    const result = await coseVerify(
-      Buffer.from(ecdsaSig01.output.cbor, 'hex'),
+    const decoded = Sign1.decode(Buffer.from(ecdsaSig01.output.cbor, 'hex'));
+    await decoded.verify(
       getKey
     );
-    expect(result.isValid).toBeTruthy();
   });
 });

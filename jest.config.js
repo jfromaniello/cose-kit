@@ -4,6 +4,8 @@ module.exports = {
   testEnvironment: 'node',
   testMatch: ['**/test/**/*.test.ts'],
   extensionsToTreatAsEsm: ['.ts'],
+  //Setup file:
+  setupFilesAfterEnv: ['./test/setup.ts'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '^(\\#.*)\\.js$': '$1',

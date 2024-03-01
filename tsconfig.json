@@ -2,11 +2,21 @@
   //for vscode
   "extends": "./tsconfig/node-cjs.json",
   "compilerOptions": {
+    "allowJs": true,
     "types": [
       "node",
       "jest"
     ],
     "resolveJsonModule": true,
-    "sourceMap": true
-  }
+    "sourceMap": true,
+    "paths": {
+      "#runtime/*": [
+        "./runtime/node/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ]
 }

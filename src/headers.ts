@@ -1,6 +1,5 @@
 import { TypedMap } from "@jfromaniello/typedmap";
 import { encoder } from "./cbor.js";
-
 /**
  * COSE Header labels registered in the IANA "COSE Header Parameters" registry.
  * Reference: https://www.iana.org/assignments/cose/cose.xhtml#header-parameters
@@ -40,6 +39,23 @@ export enum MacAlgorithms {
   HS384 = 6,
   HS512 = 7,
 }
+
+export enum EncryptionAlgorithms {
+  A128GCM = 1,
+  A192GCM = 2,
+  A256GCM = 3,
+  Direct = -6,
+}
+
+export type Direct = -6;
+
+export type SupportedEncryptionAlgorithms = 'A128GCM' | 'A192GCM' | 'A256GCM';
+
+export const EncryptionAlgorithmNames = new Map<EncryptionAlgorithms, SupportedEncryptionAlgorithms>([
+  [EncryptionAlgorithms.A128GCM, 'A128GCM'],
+  [EncryptionAlgorithms.A192GCM, 'A192GCM'],
+  [EncryptionAlgorithms.A256GCM, 'A256GCM']
+]);
 
 export const MacAlgorithmNames = new Map<MacAlgorithms, SupportedMacAlg>([
   [MacAlgorithms.HS256, 'HS256'],
@@ -97,6 +113,31 @@ export class ProtectedHeaders extends TypedMap<
 
 export type SupportedMacAlg = 'HS256' | 'HS384' | 'HS512';
 
+export class EncryptProtectedHeaders extends TypedMap<
+  [Headers.Algorithm, EncryptionAlgorithms] |
+  [Headers.Critical, Headers[]] |
+  [Headers.ContentType, number | Uint8Array] |
+  [Headers.KeyID, Uint8Array] |
+  [
+    Omit<Headers, Headers.Algorithm | Headers.Critical | Headers.ContentType | Headers.KeyID>,
+    Uint8Array | number | number[]
+  ]
+> {
+  /**
+   * Ensure input is a EncryptProtectedHeaders instance.
+   *
+   * @param headers - The headers to wrap.
+   * @returns
+   */
+  static from(headers: EncryptProtectedHeaders | ConstructorParameters<typeof EncryptProtectedHeaders>[0]) {
+    //similar to base class wrap
+    if (headers instanceof EncryptProtectedHeaders) {
+      return headers;
+    }
+    return new MacProtectedHeaders(headers);
+  }
+}
+
 export class MacProtectedHeaders extends TypedMap<
   [Headers.Algorithm, MacAlgorithms] |
   [Headers.Critical, Headers[]] |
@@ -125,9 +166,11 @@ export class MacProtectedHeaders extends TypedMap<
 export class UnprotectedHeaders extends TypedMap<
   [Headers.ContentType, number | Uint8Array] |
   [Headers.KeyID, Uint8Array] |
+  [Headers.IV, Uint8Array] |
+  [Headers.PartialIV, Uint8Array] |
   [Headers.X5Chain, Uint8Array | Uint8Array[]] |
   [
-    number,
+    Exclude<Headers, Headers.ContentType | Headers.KeyID | Headers.PartialIV | Headers.X5Chain>,
     number | number[] | Uint8Array | Uint8Array[]
   ]
 > {

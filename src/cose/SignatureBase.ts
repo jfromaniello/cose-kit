@@ -1,12 +1,23 @@
+import verify from "#runtime/verify.js";
 import { KeyLike, importX509 } from 'jose';
 import { pkijs } from '#runtime/pkijs.js';
 import { decodeBase64 } from '#runtime/base64.js';
 import { X509InvalidCertificateChain, X509NoMatchingCertificate } from '../util/errors.js';
 import { certToPEM, pemToCert } from '../util/cert.js';
 import { AlgorithmNames, Algorithms, Headers } from '../headers.js';
-import { WithHeaders } from './WithHeaders.js';
+import { COSEBase } from './COSEBase.js';
+import * as errors from "../util/errors.js";
+import validateAlgorithms from '../lib/validate_algorithms.js';
+import { COSEVerifyGetKey } from '../jwks/local.js';
 
-export class SignatureBase extends WithHeaders {
+export type VerifyOptions = {
+  externalAAD?: Uint8Array,
+  detachedPayload?: Uint8Array,
+  algorithms?: Algorithms[]
+}
+
+
+export class SignatureBase extends COSEBase {
   constructor(
     protectedHeaders: Uint8Array | Map<number, unknown>,
     unprotectedHeaders: Map<number, unknown>,
@@ -102,4 +113,33 @@ export class SignatureBase extends WithHeaders {
 
     return { publicKey, raw: x5chain[0] };
   }
+
+  protected async internalVerify(
+    payload: Uint8Array,
+    key: KeyLike | Uint8Array | COSEVerifyGetKey,
+    options?: VerifyOptions
+  ): Promise<void> {
+    if (!this.alg || !this.algName || !AlgorithmNames.has(this.alg)) {
+      throw new errors.COSEInvalid(`Unsupported algorithm ${this.alg}`);
+    }
+
+    const algorithms = options && validateAlgorithms('algorithms', options.algorithms);
+
+    if (algorithms && !algorithms.has(this.alg)) {
+      throw new errors.COSEAlgNotAllowed(
+        `[${Headers.Algorithm}] (algorithm) Header Parameter not allowed`
+      );
+    }
+
+    if (typeof key === 'function') {
+      key = await key(this);
+    }
+
+    const isValid = await verify(this.algName, key, this.signature, payload);
+
+    if (!isValid) {
+      throw new errors.COSESignatureVerificationFailed();
+    }
+  }
+
 }

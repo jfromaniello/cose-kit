@@ -1,10 +1,12 @@
-import { reverseMap } from '../util/maps.js';
+export enum KeyType {
+  OKP = 1,
+  EC = 2,
+  OCT = 4,
+  Reserved = 0,
+}
 
-export const KEY_TYPE = new Map([
-  [1, 'OKP'],
-  [2, 'EC'],
-  [4, 'oct'],
-  [0, 'Reserved'],
-]);
-
-export const COSE_KEY_TYPE = reverseMap(KEY_TYPE);
+export enum JWKKeyType {
+  OKP = KeyType.OKP,
+  EC = KeyType.EC,
+  oct = KeyType.OCT,
+}

@@ -1,0 +1,15 @@
+{
+  //for vscode
+  // "extends": "../tsconfig/node-cjs.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "paths": {
+      "#dist": [
+        "../src/index.js"
+      ]
+    }
+  },
+  "include": [
+    "./**/*.mjs"
+  ]
+}

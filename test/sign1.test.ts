@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { getPublicJWK } from './util.js';
-import { coseVerify } from '../src/verify.js';
 import { KeyLike, importJWK } from 'jose';
+import { Sign1, errors } from '../src/index.js';
 
 const basePath = `${__dirname}/Examples/sign1-tests`;
 
@@ -26,22 +26,26 @@ const testExample = (
 
 const notVerify =
   async (cose: Uint8Array, key: Uint8Array | KeyLike): Promise<void> => {
-    const { isValid } = await coseVerify(cose, key);
-    expect(isValid).toBeFalsy();
+    await expect(Sign1.decode(cose).verify(key))
+      .rejects
+      .toThrowErrorMatching(
+        errors.COSESignatureVerificationFailed,
+        'signature verification failed'
+      );
   };
 
 const verifies =
   async (cose: Uint8Array, key: Uint8Array | KeyLike, externalAAD?: Uint8Array): Promise<void> => {
-    const { isValid } = await coseVerify(cose, key, externalAAD);
-    expect(isValid).toBeTruthy();
+    await Sign1.decode(cose).verify(key, { externalAAD });
   };
 
 describe('sign1-tests', () => {
   testExample(
     'sign-fail-01.json',
     'should fail',
-    (cose, key) => {
-      return expect(coseVerify(cose, key)).rejects.toThrow('unknown COSE type');
+    async (cose) => {
+      return expect(() => Sign1.decode(cose))
+        .toThrow('Unexpected CBOR tag. Expected tag 18 (Sign1) but got 998');
     });
 
   testExample(
@@ -53,16 +57,24 @@ describe('sign1-tests', () => {
     'sign-fail-03.json',
     'should fail',
     async (cose, key) => {
-      await expect(coseVerify(cose, key))
-        .rejects.toThrow('unknown algorithm: -999');
+      await expect(Sign1.decode(cose).verify(key))
+        .rejects
+        .toThrowErrorMatching(
+          errors.COSEInvalid,
+          'Unsupported algorithm -999'
+        );
     });
 
   testExample(
     'sign-fail-04.json',
     'should fail',
     async (cose, key) => {
-      await expect(coseVerify(cose, key))
-        .rejects.toThrow('unknown algorithm: unknown');
+      await expect(Sign1.decode(cose).verify(key))
+        .rejects
+        .toThrowErrorMatching(
+          errors.COSEInvalid,
+          'Unsupported algorithm unknown'
+        );
     });
 
   testExample(
