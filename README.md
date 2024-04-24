@@ -1,3 +1,5 @@
+**DEPRECATED:** Use [@auth0/cose](https://www.npmjs.com/package/@auth0/cose).
+
 [RFC9052](https://datatracker.ietf.org/doc/rfc9052/)/[RFC9053](https://datatracker.ietf.org/doc/html/rfc9053) COSE library for node.js.
 
 **Note:** this is an early project.
@@ -22,7 +24,8 @@ You can run the following examples with `node examples/Mac0.mjs`:
 - [COSEKey: COSEKey usage](examples/COSEKey.mjs)
 
 ## Credits
--  [panva/jose](https://github.com/panva/jose) A node.js library for JOSE.
+
+- [panva/jose](https://github.com/panva/jose) A node.js library for JOSE.
 
 ## License
 
