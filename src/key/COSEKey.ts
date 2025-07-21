@@ -7,6 +7,8 @@ import { GenerateKeyPairOptions, JWK, generateKeyPair, importJWK, exportJWK } fr
 import { COSEKeyParam, KTYSpecificJWKParamsRev, JWKParam, KTYSpecificJWKParams } from "./params.js";
 import { JWKKeyOps, JWKKeyOpsToCOSE, KeyOps } from './key_ops.js';
 import { decodeBase64URL, encodeBase64URL } from "#runtime/base64.js";
+import { toBuffer } from "#runtime/buffer.js";
+
 const toArray = (v: unknown | unknown[]) => Array.isArray(v) ? v : [v];
 
 // @ts-ignore
@@ -14,7 +16,13 @@ export const JWKFromCOSEValue = new Map<string, (v: unknown) => string>([
   ['kty', (value: KeyType) => JWKKeyType[value]],
   ['crv', (value: Curve) => Curve[value]],
   ['alg', (value: Algorithms) => Algorithms[value]],
-  ['kid', (v: string | Uint8Array) => typeof v === 'string' ? v : encodeBase64URL(v)],
+  ['kid', (v: Uint8Array | string) => {
+    // Handle both string (backward compatibility) and Uint8Array (IANA spec)
+    if (typeof v === 'string') {
+      return v;
+    }
+    return new TextDecoder().decode(v);
+  }],
   ['key_ops', (v) => toArray(v).map((value) => JWKKeyOps.get(value))],
   ...([
     'x',
@@ -29,7 +37,7 @@ export const JWKToCOSEValue = new Map<string, (v: unknown) => KeyType | Uint8Arr
   ['kty', (value: JWKKeyType) => JWKKeyType[value]],
   ['crv', (value: Curve) => Curve[value]],
   ['alg', (value: Algorithms) => Algorithms[value]],
-  ['kid', (v) => v],
+  ['kid', (v: string) => toBuffer(v)],
   ['key_ops', (v) => toArray(v).map((value) => JWKKeyOpsToCOSE.get(value)).flat()],
   ...([
     'x',
@@ -59,7 +67,8 @@ export class COSEKey extends TypedMap<
    */
   static import(data: Uint8Array | Map<number, unknown>): COSEKey {
     if (data instanceof Uint8Array) {
-      return new COSEKey(encoder.decode(data));
+      const decoded = encoder.decode(data);
+      return new COSEKey(decoded);
     } else {
       return new COSEKey(data as ConstructorParameters<typeof COSEKey>[0]);
     }
