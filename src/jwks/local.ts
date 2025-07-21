@@ -16,7 +16,7 @@ import { SignatureBase } from '../cose/SignatureBase.js';
 
 import isObject from '../lib/is_object.js';
 
-import { toUTF8 } from '../lib/buffer_utils.js';
+import { areEqual } from '../lib/buffer_utils.js';
 
 function getKtyFromAlg(alg: unknown) {
   switch (typeof alg === 'string' && alg.slice(0, 2)) {
@@ -87,8 +87,10 @@ export class COSELocalJWKSet<T extends KeyLike = KeyLike> {
 
       // filter keys based on the JWK Key ID in the header
       if (candidate && kid) {
-        // TODO: check this. most examples the kid is utf8 encoded but ???
-        candidate = jwk.kid === toUTF8(kid);
+        // Compare the COSE kid (byte string) with JWK kid (text string)
+        // Convert JWK kid to bytes for comparison
+        const jwkKidBytes = new TextEncoder().encode(jwk.kid);
+        candidate = areEqual(jwkKidBytes, kid);
       }
 
       // filter keys based on the key's declared Algorithm
